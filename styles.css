@@ -121,7 +121,7 @@ ul,ol,dl,dd{margin:0;padding:0;list-style:none}
 .btn--ghost:hover{--btn-bg:rgba(255,255,255,.12);--btn-bd:#fff}
 .btn--outline{--btn-bg:transparent;--btn-fg:var(--navy);--btn-bd:var(--navy)}
 .btn--outline:hover{--btn-bg:var(--navy);--btn-fg:#fff}
-.btn--sm{min-height:42px;padding:.55rem 1.1rem;font-size:.875rem}
+.btn--sm{min-height:44px;padding:.55rem 1.1rem;font-size:.875rem}
 .btn--lg{min-height:56px;padding:1rem 1.9rem;font-size:1.02rem}
 .btn--block{width:100%}
 
@@ -154,7 +154,7 @@ ul,ol,dl,dd{margin:0;padding:0;list-style:none}
 .nav{display:none;gap:2rem}
 .nav a{
   position:relative;font-family:var(--font-head);font-weight:500;font-size:.95rem;color:#fff;
-  padding-block:.4rem;transition:color var(--dur) var(--ease);
+  padding-block:.62rem;transition:color var(--dur) var(--ease);
 }
 .nav a::after{
   content:'';position:absolute;left:0;bottom:0;height:2px;width:0;background:var(--orange);
@@ -254,7 +254,7 @@ ul,ol,dl,dd{margin:0;padding:0;list-style:none}
 
 .hero__scroll{
   position:absolute;left:50%;bottom:1.1rem;translate:-50% 0;
-  width:26px;height:42px;border:1.5px solid rgba(255,255,255,.45);border-radius:20px;
+  width:26px;height:44px;border:1.5px solid rgba(255,255,255,.45);border-radius:20px;
   display:none;place-content:center;
 }
 .hero__scroll span{display:block;width:3px;height:7px;border-radius:2px;background:#fff;animation:scrollDot 1.8s var(--ease) infinite}
@@ -675,6 +675,11 @@ span.sw > i{
 [data-reveal][data-anim="blur"].is-in{filter:none}
 [data-reveal][data-anim="none"]{opacity:1;transform:none}
 [data-reveal]{transition:opacity .8s var(--ease-expo),transform .8s var(--ease-expo)}
+/* Les variantes ci-dessus arrivent après `[data-reveal].is-in` dans la cascade
+   et ont la même spécificité : il faut donc les remettre à zéro explicitement. */
+[data-reveal][data-anim="left"].is-in,
+[data-reveal][data-anim="right"].is-in,
+[data-reveal][data-anim="zoom"].is-in{transform:none}
 
 /* ---------- Révélation d'image (volet + zoom) ---------- */
 .img-wrap{position:relative;overflow:hidden}

@@ -41,6 +41,9 @@ Les couleurs sont **échantillonnées pixel par pixel sur le logo officiel**, pa
 **Typographies** — `Outfit` (titres, géométrique, proche du logotype) + `Inter` (texte).
 Chiffres en `tabular-nums` partout où ils s'alignent (budgets, surfaces, statistiques).
 
+**En-tête** — barre blanche fixe dès le haut de page ; elle se resserre au
+défilement (logo 58 → 48 px, ombre portée renforcée).
+
 **Parti pris visuel** — modernisme architectural : angles nets (rayon 2 px), filets
 d'un pixel, trames de plan en surimpression, numérotation de sections, équerres
 orange. Volontairement à l'opposé du « carte arrondie + dégradé » générique.
@@ -52,14 +55,14 @@ La page suit une trame narrative (problème → guide → plan → preuve → ac
 | # | Section | Rôle commercial |
 |---|---|---|
 | — | Hero | Promesse + 2 CTA + 4 preuves chiffrées |
+| — | Nos clients | Bandeau des 15 logos clients, en couleur, défilement gauche → droite |
 | 01 | Le vrai problème | Nommer la douleur : multiplicité des intervenants, dérive budget, retard |
 | 02 | Qui vous accompagne | Empathie + autorité (références, fournisseurs) |
 | 03 | La méthode Wolcons | 4 étapes + tableau comparatif « sans / avec » |
 | 04 | Nos métiers | TCE · Construction clé en main · Project management |
 | — | Chiffres | 4 compteurs animés |
 | 05 | Réalisations | 13 projets réels, filtrables par mission |
-| — | Nos clients | Bandeau des 15 logos clients, en couleur, défilement gauche → droite |
-| — | Carte | Plan d'accès + adresse |
+| — | Accès | Carte Google + adresse et horaires |
 | 06 | Partenaires | Bandeau défilant des 8 fournisseurs (niveaux de gris) |
 | 07 | Questions fréquentes | Accordéon — rôle pédagogique (TCE, prix au m², avenants) |
 | 08 | Demander un devis | Formulaire + coordonnées |
@@ -89,7 +92,10 @@ et l'écoute reste active si l'utilisateur change le réglage en cours de visite
 
 ## Trois langues : FR · EN · AR
 
-Le sélecteur (globe + FR/EN/AR) se trouve dans l'en-tête et dans le menu mobile.
+Le sélecteur est **repliable** : un bouton (globe + code de la langue active +
+chevron) ouvre un petit panneau FR / EN / AR. Il se ferme au choix d'une langue,
+au clic en dehors ou à la touche Échap. Présent dans l'en-tête et dans le menu
+mobile, où le panneau s'ouvre vers le haut.
 
 - Le **français est la langue source** : `i18n.js` indexe les traductions sur le
   texte français exact tel qu'il figure dans `index.html`. Une chaîne absente du
@@ -146,12 +152,10 @@ champs et l'affichage d'état sont déjà en place.
 3. **Engagements de méthode** — reporting régulier, avenant validé avant exécution,
    conducteur de travaux **et chef de projet** dédiés : à confirmer comme réellement tenus.
 4. **12+ années d'expérience** — chiffre fourni par le client, à confirmer.
-5. **Logo sur fond sombre** — le logotype est affiché dans ses couleurs d'origine
-   en haut et en bas de page, comme demandé. Le bleu marine du mot-symbole étant
-   proche du fond sombre, un léger halo blanc (`drop-shadow`) le rend lisible sans
-   modifier les couleurs de la marque. Si le rendu ne convient pas, deux options :
-   augmenter le halo, ou revenir à `logo-light.png` (mot-symbole blanc, marque orange)
-   qui est toujours dans `assets/img/`.
+5. **Barre d'en-tête** — elle est blanche en permanence, y compris en haut de page.
+   C'est ce qui permet d'afficher le logotype dans ses couleurs d'origine sans
+   aucun artifice. Le pied de page utilise `logo-light.png` (mot-symbole blanc,
+   marque orange), la version prévue pour les fonds sombres.
 6. **Liste clients** — les 15 logos du bandeau « Ils nous font confiance » sont
    ceux fournis par le client. Plusieurs sont des fabricants de matériaux
    (Sika, Rockwool, Legrand, Carrier, Geberit, Jacob Delafon, Holcim, O'Dassia) :

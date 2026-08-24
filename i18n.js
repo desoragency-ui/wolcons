@@ -663,11 +663,8 @@
     root.setAttribute('lang', lang);
     root.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
 
-    $$('.lang__btn').forEach(function (b) {
-      var on = b.getAttribute('data-lang') === lang;
-      b.classList.toggle('is-on', on);
-      b.setAttribute('aria-pressed', String(on));
-    });
+    markButtons(lang);
+    closePanels();
 
     current = lang;
     try { window.localStorage.setItem('wolcons-lang', lang); } catch (e) {}
@@ -675,25 +672,73 @@
     window.setTimeout(function () { root.classList.remove('lang-switching'); }, 60);
   }
 
+  /* ---- sélecteur repliable ---- */
+  function markButtons(lang) {
+    $$('.lang__btn').forEach(function (b) {
+      var on = b.getAttribute('data-lang') === lang;
+      b.classList.toggle('is-on', on);
+      b.setAttribute('aria-pressed', String(on));
+    });
+    $$('[data-lang-current]').forEach(function (el) { el.textContent = lang.toUpperCase(); });
+  }
+
+  function closePanels(except) {
+    $$('[data-lang-switch]').forEach(function (box) {
+      if (box === except) return;
+      var panel = box.querySelector('[data-lang-panel]');
+      var toggle = box.querySelector('[data-lang-toggle]');
+      if (panel) panel.hidden = true;
+      if (toggle) toggle.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+  function togglePanel(box) {
+    var panel = box.querySelector('[data-lang-panel]');
+    var toggle = box.querySelector('[data-lang-toggle]');
+    if (!panel || !toggle) return;
+    var open = panel.hidden;
+    closePanels(box);
+    panel.hidden = !open;
+    toggle.setAttribute('aria-expanded', String(open));
+  }
+
   collect();
 
   var saved = 'fr';
   try { saved = window.localStorage.getItem('wolcons-lang') || 'fr'; } catch (e) {}
-  if (saved !== 'fr' && DICT[saved]) apply(saved);
-  else {
+  if (saved !== 'fr' && DICT[saved]) {
+    apply(saved);
+  } else {
     document.documentElement.setAttribute('dir', 'ltr');
-    $$('.lang__btn').forEach(function (b) {
-      var on = b.getAttribute('data-lang') === 'fr';
-      b.classList.toggle('is-on', on);
-      b.setAttribute('aria-pressed', String(on));
-    });
+    markButtons('fr');
   }
 
   document.addEventListener('click', function (e) {
-    var btn = e.target.closest ? e.target.closest('.lang__btn') : null;
-    if (!btn) return;
-    var lang = btn.getAttribute('data-lang');
-    if (lang && lang !== current) apply(lang);
+    if (!e.target.closest) return;
+
+    var choice = e.target.closest('.lang__btn');
+    if (choice) {
+      var lang = choice.getAttribute('data-lang');
+      if (lang && lang !== current) apply(lang);
+      else closePanels();
+      return;
+    }
+
+    var toggle = e.target.closest('[data-lang-toggle]');
+    if (toggle) {
+      togglePanel(toggle.closest('[data-lang-switch]'));
+      return;
+    }
+
+    closePanels();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    var open = document.querySelector('[data-lang-toggle][aria-expanded="true"]');
+    if (!open) return;
+    closePanels();
+    open.focus();
   });
 
   window.WOLCONS_LANG = { apply: apply, get: function () { return current; } };

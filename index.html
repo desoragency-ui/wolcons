@@ -60,9 +60,18 @@
     </nav>
 
     <div class="header__actions">
-      <div class="lang" role="group" data-i18n-label="langSwitch" aria-label="Choisir la langue">
-        <svg class="lang__globe" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.7 4 5.7 4 9s-1.4 6.3-4 9c-2.6-2.7-4-5.7-4-9s1.4-6.3 4-9z"/></svg>
-        <button type="button" class="lang__btn is-on" data-lang="fr" aria-pressed="true" lang="fr">FR</button><button type="button" class="lang__btn" data-lang="en" aria-pressed="false" lang="en">EN</button><button type="button" class="lang__btn" data-lang="ar" aria-pressed="false" lang="ar">AR</button>
+      <div class="lang" data-lang-switch>
+        <button type="button" class="lang__toggle" aria-expanded="false"
+                aria-controls="lang-panel-header" aria-label="Choisir la langue" data-lang-toggle>
+          <svg class="lang__globe" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.7 4 5.7 4 9s-1.4 6.3-4 9c-2.6-2.7-4-5.7-4-9s1.4-6.3 4-9z"/></svg>
+          <span class="lang__current" data-lang-current>FR</span>
+          <svg class="lang__chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="lang__panel" id="lang-panel-header" data-lang-panel hidden>
+          <button type="button" class="lang__btn is-on" data-lang="fr" lang="fr" aria-pressed="true"><b>FR</b> Français</button>
+          <button type="button" class="lang__btn" data-lang="en" lang="en" aria-pressed="false"><b>EN</b> English</button>
+          <button type="button" class="lang__btn" data-lang="ar" lang="ar" aria-pressed="false"><b>AR</b> العربية</button>
+        </div>
       </div>
       <a class="btn btn--primary btn--sm" href="#devis">Demander un devis</a>
       <button class="burger" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mobile-menu" data-burger>
@@ -85,9 +94,18 @@
   <div class="mobile-menu__foot">
     <a class="btn btn--primary btn--block" href="#devis">Demander un devis gratuit</a>
     <a class="mobile-menu__tel" href="tel:+212661978186">06 61 97 81 86</a>
-    <div class="lang lang--menu" role="group" data-i18n-label="langSwitch" aria-label="Choisir la langue">
-      <svg class="lang__globe" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.7 4 5.7 4 9s-1.4 6.3-4 9c-2.6-2.7-4-5.7-4-9s1.4-6.3 4-9z"/></svg>
-      <button type="button" class="lang__btn is-on" data-lang="fr" aria-pressed="true" lang="fr">FR</button><button type="button" class="lang__btn" data-lang="en" aria-pressed="false" lang="en">EN</button><button type="button" class="lang__btn" data-lang="ar" aria-pressed="false" lang="ar">AR</button>
+    <div class="lang lang--menu" data-lang-switch>
+      <button type="button" class="lang__toggle" aria-expanded="false"
+              aria-controls="lang-panel-menu" aria-label="Choisir la langue" data-lang-toggle>
+        <svg class="lang__globe" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.7 4 5.7 4 9s-1.4 6.3-4 9c-2.6-2.7-4-5.7-4-9s1.4-6.3 4-9z"/></svg>
+        <span class="lang__current" data-lang-current>FR</span>
+        <svg class="lang__chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div class="lang__panel" id="lang-panel-menu" data-lang-panel hidden>
+        <button type="button" class="lang__btn is-on" data-lang="fr" lang="fr" aria-pressed="true"><b>FR</b> Français</button>
+        <button type="button" class="lang__btn" data-lang="en" lang="en" aria-pressed="false"><b>EN</b> English</button>
+        <button type="button" class="lang__btn" data-lang="ar" lang="ar" aria-pressed="false"><b>AR</b> العربية</button>
+      </div>
     </div>
   </div>
 </div>
@@ -142,6 +160,57 @@
   <a class="hero__scroll" href="#probleme" aria-label="Faire défiler">
     <span></span>
   </a>
+</section>
+
+<!-- ══════════ NOS CLIENTS ══════════ -->
+<section class="section section--tight" id="clients">
+  <div class="shell">
+    <header class="section__head section__head--center">
+      <p class="eyebrow" data-reveal>Ils nous font confiance</p>
+      <h2 class="h2 h2--sm" data-reveal data-reveal-delay="80">
+        Des industriels, des enseignes et des cabinets <em>qui nous rappellent</em>
+      </h2>
+    </header>
+  </div>
+
+  <div class="marquee marquee--color marquee--rtl" data-reveal>
+    <div class="marquee__track">
+      <div class="marquee__group">
+        <img src="assets/img/clients/huawei.png" alt="Huawei" loading="lazy">
+        <img src="assets/img/clients/novares.png" alt="Novares" loading="lazy">
+        <img src="assets/img/clients/bcg.png" alt="Boston Consulting Group" loading="lazy">
+        <img src="assets/img/clients/holcim.png" alt="Holcim" loading="lazy">
+        <img src="assets/img/clients/legrand.png" alt="Legrand" loading="lazy">
+        <img src="assets/img/clients/st-louis.png" alt="Saint-Louis" loading="lazy">
+        <img src="assets/img/clients/carrier.png" alt="Carrier" loading="lazy">
+        <img src="assets/img/clients/sika.png" alt="Sika" loading="lazy">
+        <img src="assets/img/clients/geberit.png" alt="Geberit" loading="lazy">
+        <img src="assets/img/clients/rockwool.png" alt="Rockwool" loading="lazy">
+        <img src="assets/img/clients/jacob-delafon.png" alt="Jacob Delafon" loading="lazy">
+        <img src="assets/img/clients/cosimco.png" alt="Cosimco Maroc" loading="lazy">
+        <img src="assets/img/clients/odassia.png" alt="O'Dassia" loading="lazy">
+        <img src="assets/img/clients/still-architecture.png" alt="Still Architecture" loading="lazy">
+        <img src="assets/img/clients/ish.png" alt="ish" loading="lazy">
+      </div>
+      <div class="marquee__group" aria-hidden="true">
+        <img src="assets/img/clients/huawei.png" alt="" loading="lazy">
+        <img src="assets/img/clients/novares.png" alt="" loading="lazy">
+        <img src="assets/img/clients/bcg.png" alt="" loading="lazy">
+        <img src="assets/img/clients/holcim.png" alt="" loading="lazy">
+        <img src="assets/img/clients/legrand.png" alt="" loading="lazy">
+        <img src="assets/img/clients/st-louis.png" alt="" loading="lazy">
+        <img src="assets/img/clients/carrier.png" alt="" loading="lazy">
+        <img src="assets/img/clients/sika.png" alt="" loading="lazy">
+        <img src="assets/img/clients/geberit.png" alt="" loading="lazy">
+        <img src="assets/img/clients/rockwool.png" alt="" loading="lazy">
+        <img src="assets/img/clients/jacob-delafon.png" alt="" loading="lazy">
+        <img src="assets/img/clients/cosimco.png" alt="" loading="lazy">
+        <img src="assets/img/clients/odassia.png" alt="" loading="lazy">
+        <img src="assets/img/clients/still-architecture.png" alt="" loading="lazy">
+        <img src="assets/img/clients/ish.png" alt="" loading="lazy">
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- ══════════ PROBLÈME ══════════ -->
@@ -667,52 +736,27 @@
   </div>
 </section>
 
-<!-- ══════════ NOS CLIENTS + CARTE ══════════ -->
-<section class="section section--paper" id="clients">
+<!-- ══════════ ACCÈS ══════════ -->
+<section class="section section--paper section--tight" id="acces">
   <div class="shell">
-    <header class="section__head section__head--center">
-      <p class="eyebrow" data-reveal>Ils nous font confiance</p>
-      <h2 class="h2 h2--sm" data-reveal data-reveal-delay="80">
-        Des industriels, des enseignes et des cabinets <em>qui nous rappellent</em>
-      </h2>
-    </header>
-  </div>
-
-  <div class="marquee marquee--color marquee--rtl" data-reveal>
-    <div class="marquee__track">
-      <div class="marquee__group">
-        <img src="assets/img/clients/huawei.png" alt="Huawei" loading="lazy">
-        <img src="assets/img/clients/novares.png" alt="Novares" loading="lazy">
-        <img src="assets/img/clients/bcg.png" alt="Boston Consulting Group" loading="lazy">
-        <img src="assets/img/clients/holcim.png" alt="Holcim" loading="lazy">
-        <img src="assets/img/clients/legrand.png" alt="Legrand" loading="lazy">
-        <img src="assets/img/clients/st-louis.png" alt="Saint-Louis" loading="lazy">
-        <img src="assets/img/clients/carrier.png" alt="Carrier" loading="lazy">
-        <img src="assets/img/clients/sika.png" alt="Sika" loading="lazy">
-        <img src="assets/img/clients/geberit.png" alt="Geberit" loading="lazy">
-        <img src="assets/img/clients/rockwool.png" alt="Rockwool" loading="lazy">
-        <img src="assets/img/clients/jacob-delafon.png" alt="Jacob Delafon" loading="lazy">
-        <img src="assets/img/clients/cosimco.png" alt="Cosimco Maroc" loading="lazy">
-        <img src="assets/img/clients/odassia.png" alt="O'Dassia" loading="lazy">
-        <img src="assets/img/clients/still-architecture.png" alt="Still Architecture" loading="lazy">
-        <img src="assets/img/clients/ish.png" alt="ish" loading="lazy">
-      </div>
-      <div class="marquee__group" aria-hidden="true">
-        <img src="assets/img/clients/huawei.png" alt="" loading="lazy">
-        <img src="assets/img/clients/novares.png" alt="" loading="lazy">
-        <img src="assets/img/clients/bcg.png" alt="" loading="lazy">
-        <img src="assets/img/clients/holcim.png" alt="" loading="lazy">
-        <img src="assets/img/clients/legrand.png" alt="" loading="lazy">
-        <img src="assets/img/clients/st-louis.png" alt="" loading="lazy">
-        <img src="assets/img/clients/carrier.png" alt="" loading="lazy">
-        <img src="assets/img/clients/sika.png" alt="" loading="lazy">
-        <img src="assets/img/clients/geberit.png" alt="" loading="lazy">
-        <img src="assets/img/clients/rockwool.png" alt="" loading="lazy">
-        <img src="assets/img/clients/jacob-delafon.png" alt="" loading="lazy">
-        <img src="assets/img/clients/cosimco.png" alt="" loading="lazy">
-        <img src="assets/img/clients/odassia.png" alt="" loading="lazy">
-        <img src="assets/img/clients/still-architecture.png" alt="" loading="lazy">
-        <img src="assets/img/clients/ish.png" alt="" loading="lazy">
+    <!-- Carte Google -->
+    <div class="map" data-reveal data-anim="zoom">
+      <iframe
+        title="Localisation de Wolcons sur Google Maps — Bd Brahim Roudani, Casablanca"
+        src="https://www.google.com/maps?q=Bd%20Brahim%20Roudani%2C%20r%C3%A9sidence%20les%20palmiers%20B9%2C%20Casablanca&amp;z=16&amp;hl=fr&amp;output=embed"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        allowfullscreen></iframe>
+      <div class="map__card">
+        <h3>Wolcons — Casablanca</h3>
+        <p>
+          Bd Brahim Roudani, résidence les palmiers B9,<br>
+          4<sup>e</sup> étage n°33, Casablanca, Maroc<br>
+          Lundi – vendredi · 09h00 – 17h00
+        </p>
+        <a class="link-arrow" href="https://www.google.com/maps/search/?api=1&amp;query=Bd+Brahim+Roudani+r%C3%A9sidence+les+palmiers+B9+Casablanca" target="_blank" rel="noopener">
+          Itinéraire <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h14M13 6l6 6-6 6"/></svg>
+        </a>
       </div>
     </div>
   </div>
@@ -961,7 +1005,7 @@
 <footer class="footer">
   <div class="shell footer__grid">
     <div class="footer__brand">
-      <img src="assets/img/logo.png" alt="Wolcons" width="743" height="239" loading="lazy">
+      <img src="assets/img/logo-light.png" alt="Wolcons" width="743" height="239" loading="lazy">
       <p>
         Entreprise générale de construction et d'aménagement tout corps d'état.
         Casablanca · Rabat · Kénitra · Marrakech.

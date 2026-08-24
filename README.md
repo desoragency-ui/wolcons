@@ -2,20 +2,21 @@
 
 Refonte du site de **Wolcons** (entreprise générale de construction et d'aménagement
 tout corps d'état, Casablanca). Site statique, une seule page, 100 % en français,
-sans dépendance ni build.
+sans dépendance ni build. Trilingue **français / anglais / arabe**.
 
 ```
 wolcons/
 ├── index.html      Page unique (9 sections + header/footer)
-├── styles.css      Design system, composants, moteur d'animation, responsive
-├── script.js       Animations, carrousel, filtres, formulaire
-└── assets/img/     Visuels WebP + logos PNG (2,3 Mo au total)
+├── styles.css      Design system, composants, moteur d'animation, RTL, responsive
+├── i18n.js         Dictionnaires FR / EN / AR + sélecteur de langue
+├── script.js       Animations, filtres, accordéon, formulaire
+└── assets/img/     Visuels WebP, logos partenaires + clients PNG détourés
 ```
 
 ## Lancer en local
 
-Ouvrir `index.html` directement, **ou** servir le dossier (recommandé — le carrousel
-et les images paresseuses se comportent mieux) :
+Ouvrir `index.html` directement, **ou** servir le dossier (recommandé — les images
+paresseuses et le `localStorage` du sélecteur de langue se comportent mieux) :
 
 ```bash
 python -m http.server 8130 --directory wolcons
@@ -34,6 +35,8 @@ Les couleurs sont **échantillonnées pixel par pixel sur le logo officiel**, pa
 | Orange | `#E85A38` | accent unique — CTA, chiffres, soulignements |
 | Papier | `#F6F4F1` | sections claires alternées |
 | Encre | `#0D1A24` | texte courant |
+
+**Typographie arabe** — `Cairo`, activée automatiquement en mode `lang="ar"`.
 
 **Typographies** — `Outfit` (titres, géométrique, proche du logotype) + `Inter` (texte).
 Chiffres en `tabular-nums` partout où ils s'alignent (budgets, surfaces, statistiques).
@@ -55,10 +58,11 @@ La page suit une trame narrative (problème → guide → plan → preuve → ac
 | 04 | Nos métiers | TCE · Construction clé en main · Project management |
 | — | Chiffres | 4 compteurs animés |
 | 05 | Réalisations | 13 projets réels, filtrables par mission |
-| 06 | Avis + carte | Note Google, carrousel de témoignages, plan d'accès |
-| 07 | Partenaires | Bandeau défilant des 8 fournisseurs |
-| 08 | Questions fréquentes | Accordéon — rôle pédagogique (TCE, prix au m², avenants) |
-| 09 | Demander un devis | Formulaire + coordonnées |
+| — | Nos clients | Bandeau des 7 logos clients, en couleur, défilement gauche → droite |
+| — | Carte | Plan d'accès + adresse |
+| 06 | Partenaires | Bandeau défilant des 16 fournisseurs (niveaux de gris) |
+| 07 | Questions fréquentes | Accordéon — rôle pédagogique (TCE, prix au m², avenants) |
+| 08 | Demander un devis | Formulaire + coordonnées |
 
 ## Animations
 
@@ -73,15 +77,36 @@ et **une seule boucle `requestAnimationFrame`** pour le défilement.
 - Compteurs + barres de progression sur les chiffres
 - Rail de progression orange sous les 4 étapes de la méthode
 - Projecteur qui suit le curseur sur les sections sombres
-- Inclinaison 3D des cartes (projets, métiers, avis)
+- Inclinaison 3D des cartes (projets, métiers)
 - Boutons magnétiques + halo suiveur
 - Menu mobile : ouverture avec liens décalés
 - Accordéon FAQ : hauteur animée (Web Animations API)
-- Carrousel : autoplay, balayage tactile, flèches, points, clavier
+- Deux bandeaux défilants : clients (couleur, gauche → droite) et fournisseurs
 - Barre de progression de lecture + bouton retour en haut avec anneau
 
 `prefers-reduced-motion: reduce` **désactive tout**, y compris le préchargeur,
 et l'écoute reste active si l'utilisateur change le réglage en cours de visite.
+
+## Trois langues : FR · EN · AR
+
+Le sélecteur (globe + FR/EN/AR) se trouve dans l'en-tête et dans le menu mobile.
+
+- Le **français est la langue source** : `i18n.js` indexe les traductions sur le
+  texte français exact tel qu'il figure dans `index.html`. Une chaîne absente du
+  dictionnaire (nom propre, montant, ville) reste inchangée.
+- Le choix est mémorisé dans `localStorage` (`wolcons-lang`).
+- En arabe, `<html>` passe en `lang="ar" dir="rtl"`, la typographie bascule sur
+  **Cairo**, et une feuille de règles `[dir="rtl"]` remet à l'endroit les
+  éléments directionnels (équerres, flèches, filets, badges, carte).
+- `i18n.js` est chargé **avant** `script.js` : la traduction est appliquée avant
+  le découpage des titres mot par mot. À chaque changement de langue, les titres
+  sont réécrits puis re-découpés via `window.__wolconsSplit`.
+
+### Ajouter ou corriger une traduction
+
+Ouvrir `i18n.js` → objet `DICT` → sections `en` et `ar`. La clé est la phrase
+française **exacte** (espaces normalisés). Pour traduire une nouvelle phrase,
+copier le texte français depuis `index.html` et l'ajouter comme clé.
 
 ## Responsive & accessibilité
 
@@ -113,34 +138,38 @@ champs et l'affichage d'état sont déjà en place.
 
 ## ⚠ À valider avec le client avant mise en ligne
 
-1. **Témoignages** — les six avis du carrousel (`section#avis`) sont des **exemples
-   de mise en page**, pas de vrais avis. À remplacer par des retours clients réels
-   et autorisés. La note **5,0 ★** et le lien vers la fiche Google sont, eux, authentiques
-   (relevés le 20/08/2026) ; le nombre d'avis n'est pas affiché car Google ne l'expose pas
-   publiquement sur cette fiche.
-2. **Horaires** — « lundi – vendredi 09h00 – 17h00 » est déduit de la fiche Google
+1. **Horaires** — « lundi – vendredi 09h00 – 17h00 » est déduit de la fiche Google
    (jeudi 09:00–17:00, ouverture vendredi à 09:00). À confirmer.
-3. **Fourchettes de prix** en FAQ (6 000–12 500 DH/m² en aménagement, 4 500–6 000
-   DH/m² en gros œuvre) — **calculées à partir des budgets et surfaces publiés par
-   Wolcons lui-même**. À valider ou ajuster.
-4. **Engagements de méthode** — reporting hebdomadaire, avenant validé avant
-   exécution, conducteur de travaux dédié : à confirmer comme réellement tenus.
-5. **Projets ↔ photos** — les visuels proviennent de l'ancien site ; l'association
-   photo/projet est plausible mais à vérifier fiche par fiche.
-6. **Adresse** — le site affiche « Bd 11 janvier, rue Essanober, imm 2 n°12 »
-   (ancien site). Google indique « imm 2, Bd 11 janvier, n:12 Rue Essanaoubar,
-   Casablanca 20480 ». Harmoniser.
-7. **LinkedIn** — l'ancien site pointait vers une URL d'administration ; remplacée
+2. **Traductions EN et AR** — rédigées à partir du texte français. À faire relire
+   par un locuteur natif avant mise en ligne, en particulier les termes techniques
+   du bâtiment en arabe.
+3. **Engagements de méthode** — reporting régulier, avenant validé avant exécution,
+   conducteur de travaux **et chef de projet** dédiés : à confirmer comme réellement tenus.
+4. **12+ années d'expérience** — chiffre fourni par le client, à confirmer.
+5. **Logo sur fond sombre** — le logotype est affiché dans ses couleurs d'origine
+   en haut et en bas de page, comme demandé. Le bleu marine du mot-symbole étant
+   proche du fond sombre, un léger halo blanc (`drop-shadow`) le rend lisible sans
+   modifier les couleurs de la marque. Si le rendu ne convient pas, deux options :
+   augmenter le halo, ou revenir à `logo-light.png` (mot-symbole blanc, marque orange)
+   qui est toujours dans `assets/img/`.
+6. **LinkedIn** — l'ancien site pointait vers une URL d'administration ; remplacée
    par l'URL publique `linkedin.com/company/106527329/`. À vérifier.
 
 ## Visuels
 
 Toutes les photos proviennent du site existant (chantiers et livraisons réels de
-Wolcons), recadrées, harmonisées et réencodées en WebP. Les logos partenaires et le
-logotype ont été détourés (fond transparent) ; `logo-light.png` est la version
-blanche pour fonds sombres.
+Wolcons), recadrées, harmonisées et réencodées en WebP.
 
-Remplacer une image = déposer un fichier de même nom dans `assets/img/`.
+**Association projet ↔ photo** : l'ordre a été relevé directement dans le balisage
+de `wolcons.com`, où chaque titre de projet précède immédiatement son visuel. Les
+13 fiches correspondent donc à l'ordre officiel du site d'origine.
+
+**Logos** : logotype Wolcons et 16 logos fournisseurs détourés (fond transparent)
+dans `assets/img/` ; 7 logos clients dans `assets/img/clients/`, détourés et
+conservés **en couleur**. `logo-light.png` est la version à mot-symbole blanc,
+conservée au cas où.
+
+Remplacer une image = déposer un fichier de même nom dans le même dossier.
 
 ## Déploiement
 

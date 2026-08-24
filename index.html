@@ -19,7 +19,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="assets/img/hero.webp" media="(min-width: 720px)">
 <link rel="stylesheet" href="styles.css">
 
@@ -52,18 +52,18 @@
     </a>
 
     <nav class="nav" aria-label="Navigation principale">
+      <a href="#apropos">Nous sommes</a>
       <a href="#methode">La méthode</a>
       <a href="#metiers">Nos métiers</a>
       <a href="#realisations">Réalisations</a>
-      <a href="#avis">Avis</a>
       <a href="#faq">Questions</a>
     </nav>
 
     <div class="header__actions">
-      <a class="header__tel" href="tel:+212661978186">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.6a1 1 0 0 1-.25 1z"/></svg>
-        <span>06 61 97 81 86</span>
-      </a>
+      <div class="lang" role="group" data-i18n-label="langSwitch" aria-label="Choisir la langue">
+        <svg class="lang__globe" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.7 4 5.7 4 9s-1.4 6.3-4 9c-2.6-2.7-4-5.7-4-9s1.4-6.3 4-9z"/></svg>
+        <button type="button" class="lang__btn is-on" data-lang="fr" aria-pressed="true" lang="fr">FR</button><button type="button" class="lang__btn" data-lang="en" aria-pressed="false" lang="en">EN</button><button type="button" class="lang__btn" data-lang="ar" aria-pressed="false" lang="ar">AR</button>
+      </div>
       <a class="btn btn--primary btn--sm" href="#devis">Demander un devis</a>
       <button class="burger" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mobile-menu" data-burger>
         <span></span><span></span><span></span>
@@ -74,17 +74,21 @@
 
 <div class="mobile-menu" id="mobile-menu" data-menu hidden>
   <nav aria-label="Navigation mobile">
-    <a href="#methode"><em>01</em> La méthode</a>
-    <a href="#metiers"><em>02</em> Nos métiers</a>
-    <a href="#realisations"><em>03</em> Réalisations</a>
-    <a href="#avis"><em>04</em> Avis & contact</a>
-    <a href="#partenaires"><em>05</em> Partenaires</a>
+    <a href="#apropos"><em>01</em> Nous sommes</a>
+    <a href="#methode"><em>02</em> La méthode</a>
+    <a href="#metiers"><em>03</em> Nos métiers</a>
+    <a href="#realisations"><em>04</em> Réalisations</a>
+    <a href="#clients"><em>05</em> Nos clients</a>
     <a href="#faq"><em>06</em> Questions fréquentes</a>
     <a href="#devis"><em>07</em> Contact</a>
   </nav>
   <div class="mobile-menu__foot">
     <a class="btn btn--primary btn--block" href="#devis">Demander un devis gratuit</a>
     <a class="mobile-menu__tel" href="tel:+212661978186">06 61 97 81 86</a>
+    <div class="lang lang--menu" role="group" data-i18n-label="langSwitch" aria-label="Choisir la langue">
+      <svg class="lang__globe" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.7 4 5.7 4 9s-1.4 6.3-4 9c-2.6-2.7-4-5.7-4-9s1.4-6.3 4-9z"/></svg>
+      <button type="button" class="lang__btn is-on" data-lang="fr" aria-pressed="true" lang="fr">FR</button><button type="button" class="lang__btn" data-lang="en" aria-pressed="false" lang="en">EN</button><button type="button" class="lang__btn" data-lang="ar" aria-pressed="false" lang="ar">AR</button>
+    </div>
   </div>
 </div>
 
@@ -420,7 +424,7 @@
       <li data-reveal><strong data-count="120" data-suffix=" MDH">0</strong><span>de travaux livrés</span></li>
       <li data-reveal data-reveal-delay="80"><strong data-count="13">0</strong><span>projets référencés</span></li>
       <li data-reveal data-reveal-delay="160"><strong data-count="14000" data-suffix=" m²">0</strong><span>construits et aménagés</span></li>
-      <li data-reveal data-reveal-delay="240"><strong data-count="8" data-suffix="">0</strong><span>fournisseurs partenaires</span></li>
+      <li data-reveal data-reveal-delay="240"><strong data-count="12" data-suffix="+">0</strong><span>années d’expérience</span></li>
     </ul>
   </div>
 </section>
@@ -528,7 +532,7 @@
 
       <article class="project" data-cat="construction" data-reveal data-reveal-delay="120">
         <div class="project__media">
-          <img src="assets/img/p-showroom-tp.webp" alt="Showroom Thomas &amp; Piron construit par Wolcons" width="900" height="675" loading="lazy" decoding="async">
+          <img src="assets/img/p-showroom-tp.webp" alt="Showroom Thomas &amp; Piron livré par Wolcons à Casablanca" width="900" height="675" loading="lazy" decoding="async">
           <span class="project__badge">Construction</span>
         </div>
         <div class="project__body">
@@ -544,7 +548,7 @@
 
       <article class="project" data-cat="construction" data-reveal>
         <div class="project__media">
-          <img src="assets/img/p-villa-cs.webp" alt="Villa CS livrée par Wolcons à Casablanca" width="900" height="675" loading="lazy" decoding="async">
+          <img src="assets/img/p-villa-cs.webp" alt="Villa CS : structure en cours d'élévation par Wolcons" width="900" height="675" loading="lazy" decoding="async">
           <span class="project__badge">Construction</span>
         </div>
         <div class="project__body">
@@ -560,7 +564,7 @@
 
       <article class="project" data-cat="construction" data-reveal data-reveal-delay="60">
         <div class="project__media">
-          <img src="assets/img/p-villa-e.webp" alt="Villa E construite par Wolcons à Rabat" width="900" height="675" loading="lazy" decoding="async">
+          <img src="assets/img/p-villa-e.webp" alt="Villa E en cours de gros œuvre par Wolcons à Rabat" width="900" height="675" loading="lazy" decoding="async">
           <span class="project__badge">Construction</span>
         </div>
         <div class="project__body">
@@ -576,7 +580,7 @@
 
       <article class="project" data-cat="construction" data-reveal data-reveal-delay="120">
         <div class="project__media">
-          <img src="assets/img/p-villa-ib.webp" alt="Villa IB en cours de construction par Wolcons" width="900" height="675" loading="lazy" decoding="async">
+          <img src="assets/img/p-villa-ib.webp" alt="Villa IB : fondations et dallage réalisés par Wolcons" width="900" height="675" loading="lazy" decoding="async">
           <span class="project__badge">Construction</span>
         </div>
         <div class="project__body">
@@ -624,7 +628,7 @@
 
       <article class="project" data-cat="construction" data-reveal data-reveal-delay="120">
         <div class="project__media">
-          <img src="assets/img/p-villa-mw.webp" alt="Villa MW en construction par Wolcons" width="900" height="675" loading="lazy" decoding="async">
+          <img src="assets/img/p-villa-mw.webp" alt="Villa MW livrée par Wolcons à Casablanca" width="900" height="675" loading="lazy" decoding="async">
           <span class="project__badge">Construction</span>
         </div>
         <div class="project__body">
@@ -663,169 +667,61 @@
   </div>
 </section>
 
-<!-- ══════════ AVIS + CARTE ══════════
-     ⚠ CONTENU À VALIDER : la note « 5,0 » et le lien pointent vers la vraie fiche
-     Google Business de Wolcons. Les six témoignages ci-dessous sont des EXEMPLES
-     de mise en page rédigés pour la maquette : remplacez-les par de vrais avis
-     clients (ou par les avis Google réels) avant la mise en ligne.
-     Voir README.md § « Avis clients ».
-================================================================ -->
-<section class="section section--paper" id="avis">
+<!-- ══════════ NOS CLIENTS + CARTE ══════════ -->
+<section class="section section--paper" id="clients">
   <div class="shell">
+    <header class="section__head section__head--center">
+      <p class="eyebrow" data-reveal>Ils nous font confiance</p>
+      <h2 class="h2 h2--sm" data-reveal data-reveal-delay="80">
+        Des industriels, des enseignes et des cabinets <em>qui nous rappellent</em>
+      </h2>
+    </header>
+  </div>
 
-    <div class="reviews__head">
-      <div>
-        <p class="eyebrow" data-reveal><i>06</i> Ils nous ont fait confiance</p>
-        <h2 class="h2" data-split data-reveal data-reveal-delay="60">Ce que disent <em>ceux qui ont déjà signé</em></h2>
-        <p class="section__lead" data-reveal data-reveal-delay="140">
-          Une entreprise de construction se juge après la livraison, pas avant.
-          Voici les retours de clients particuliers, industriels et entreprises.
-        </p>
+  <div class="marquee marquee--color marquee--rtl" data-reveal>
+    <div class="marquee__track">
+      <div class="marquee__group">
+        <img src="assets/img/clients/huawei.png" alt="Huawei" loading="lazy">
+        <img src="assets/img/clients/novares.png" alt="Novares" loading="lazy">
+        <img src="assets/img/clients/bcg.png" alt="Boston Consulting Group" loading="lazy">
+        <img src="assets/img/clients/st-louis.png" alt="Saint-Louis" loading="lazy">
+        <img src="assets/img/clients/cosimco.png" alt="Cosimco Maroc" loading="lazy">
+        <img src="assets/img/clients/still-architecture.png" alt="Still Architecture" loading="lazy">
+        <img src="assets/img/clients/ish.png" alt="ish" loading="lazy">
       </div>
-
-      <div class="gscore" data-reveal data-reveal-delay="200" data-anim="zoom">
-        <span class="gscore__g" aria-hidden="true">G</span>
-        <div>
-          <div class="gscore__val">
-            <b>5,0</b>
-            <span class="gscore__stars" role="img" aria-label="Note de 5 sur 5 étoiles">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg>
-            </span>
-          </div>
-          <small>
-            Note Google ·
-            <a href="https://www.google.com/maps/place/wolcons/@33.5900316,-7.6354081,14.31z/data=!4m6!3m5!1s0xda7d300351cd729:0xd8584e00a3c460b7!8m2!3d33.5892498!4d-7.6135541" target="_blank" rel="noopener">voir la fiche</a>
-          </small>
-        </div>
+      <div class="marquee__group" aria-hidden="true">
+        <img src="assets/img/clients/huawei.png" alt="" loading="lazy">
+        <img src="assets/img/clients/novares.png" alt="" loading="lazy">
+        <img src="assets/img/clients/bcg.png" alt="" loading="lazy">
+        <img src="assets/img/clients/st-louis.png" alt="" loading="lazy">
+        <img src="assets/img/clients/cosimco.png" alt="" loading="lazy">
+        <img src="assets/img/clients/still-architecture.png" alt="" loading="lazy">
+        <img src="assets/img/clients/ish.png" alt="" loading="lazy">
       </div>
     </div>
+  </div>
 
-    <div class="slider" data-slider>
-      <div class="slider__viewport">
-        <div class="slider__track" data-slider-track>
-
-          <article class="review" data-reveal>
-            <span class="review__stars" role="img" aria-label="5 étoiles sur 5">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg>
-            </span>
-            <blockquote>Nous avions besoin d'un plateau de bureaux opérationnel pour une date fixe. Le planning a été tenu au jour près, et le budget n'a pas bougé d'un dirham entre la signature et la réception.</blockquote>
-            <div class="review__who">
-              <span class="review__ava" aria-hidden="true">SB</span>
-              <span>
-                <span class="review__name">S. Bennani</span>
-                <span class="review__meta">Directrice d'agence · Casablanca</span>
-              </span>
-            </div>
-          </article>
-
-          <article class="review" data-reveal data-reveal-delay="60">
-            <span class="review__stars" role="img" aria-label="5 étoiles sur 5">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg>
-            </span>
-            <blockquote>J'ai fait construire ma villa depuis l'étranger. Photos chaque semaine, situation budgétaire claire, un seul interlocuteur qui répond. Je n'ai découvert aucune mauvaise surprise à la livraison.</blockquote>
-            <div class="review__who">
-              <span class="review__ava" aria-hidden="true">YE</span>
-              <span>
-                <span class="review__name">Y. El Amrani</span>
-                <span class="review__meta">Villa 310 m² · Rabat</span>
-              </span>
-            </div>
-          </article>
-
-          <article class="review" data-reveal data-reveal-delay="120">
-            <span class="review__stars" role="img" aria-label="5 étoiles sur 5">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg>
-            </span>
-            <blockquote>Sur un site industriel, la coordination est tout. Wolcons a géré l'ensemble des lots sans que nous ayons à arbitrer entre corps de métier. La qualité d'exécution est au niveau de nos standards groupe.</blockquote>
-            <div class="review__who">
-              <span class="review__ava" aria-hidden="true">MC</span>
-              <span>
-                <span class="review__name">M. Chraïbi</span>
-                <span class="review__meta">Responsable travaux, industrie · Kénitra</span>
-              </span>
-            </div>
-          </article>
-
-          <article class="review" data-reveal>
-            <span class="review__stars" role="img" aria-label="5 étoiles sur 5">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg>
-            </span>
-            <blockquote>Le devis était détaillé lot par lot, avec les références de matériaux. C'est la première fois qu'on m'explique où part chaque dirham. Ça change complètement la relation de confiance.</blockquote>
-            <div class="review__who">
-              <span class="review__ava" aria-hidden="true">NT</span>
-              <span>
-                <span class="review__name">N. Tazi</span>
-                <span class="review__meta">Rénovation d'appartement · Casablanca</span>
-              </span>
-            </div>
-          </article>
-
-          <article class="review" data-reveal data-reveal-delay="60">
-            <span class="review__stars" role="img" aria-label="5 étoiles sur 5">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg>
-            </span>
-            <blockquote>Restaurer un riad demande de la patience et le respect de l'existant. L'équipe a su travailler avec les artisans traditionnels tout en tenant un planning moderne. Le résultat est fidèle à ce qui était promis.</blockquote>
-            <div class="review__who">
-              <span class="review__ava" aria-hidden="true">CD</span>
-              <span>
-                <span class="review__name">C. Dupont</span>
-                <span class="review__meta">Riad · Marrakech</span>
-              </span>
-            </div>
-          </article>
-
-          <article class="review" data-reveal data-reveal-delay="120">
-            <span class="review__stars" role="img" aria-label="5 étoiles sur 5">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.8z"/></svg>
-            </span>
-            <blockquote>Ouverture de showroom oblige, nous n'avions aucune marge sur la date. Réserves levées avant la réception, boutique livrée prête à recevoir la marchandise. Nous retravaillerons avec eux.</blockquote>
-            <div class="review__who">
-              <span class="review__ava" aria-hidden="true">RL</span>
-              <span>
-                <span class="review__name">R. Lahlou</span>
-                <span class="review__meta">Retail · Casablanca</span>
-              </span>
-            </div>
-          </article>
-
-        </div>
-      </div>
-
-      <div class="slider__nav">
-        <button class="slider__btn" type="button" aria-label="Témoignages précédents" data-slider-prev>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12H6M11 18l-6-6 6-6"/></svg>
-        </button>
-        <button class="slider__btn" type="button" aria-label="Témoignages suivants" data-slider-next>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h14M13 6l6 6-6 6"/></svg>
-        </button>
-        <div class="slider__dots" role="tablist" aria-label="Choisir un témoignage" data-slider-dots></div>
-      </div>
-    </div>
-
+  <div class="shell">
     <!-- Carte Google -->
     <div class="map" data-reveal data-anim="zoom">
       <iframe
-        title="Localisation de Wolcons sur Google Maps — Bd 11 janvier, Casablanca"
-        src="https://www.google.com/maps?q=33.5892498,-7.6135541&amp;z=16&amp;hl=fr&amp;output=embed"
+        title="Localisation de Wolcons sur Google Maps — Bd Brahim Roudani, Casablanca"
+        src="https://www.google.com/maps?q=Bd%20Brahim%20Roudani%2C%20r%C3%A9sidence%20les%20palmiers%20B9%2C%20Casablanca&amp;z=16&amp;hl=fr&amp;output=embed"
         loading="lazy"
         referrerpolicy="no-referrer-when-downgrade"
         allowfullscreen></iframe>
       <div class="map__card">
         <h3>Wolcons — Casablanca</h3>
         <p>
-          imm 2, Bd 11 janvier, n°12 rue Essanaoubar, 20480 Casablanca<br>
+          Bd Brahim Roudani, résidence les palmiers B9,<br>
+          4<sup>e</sup> étage n°33, Casablanca, Maroc<br>
           Lundi – vendredi · 09h00 – 17h00
         </p>
-        <a class="link-arrow" href="https://www.google.com/maps/place/wolcons/@33.5900316,-7.6354081,14.31z/data=!4m6!3m5!1s0xda7d300351cd729:0xd8584e00a3c460b7!8m2!3d33.5892498!4d-7.6135541" target="_blank" rel="noopener">
+        <a class="link-arrow" href="https://www.google.com/maps/search/?api=1&amp;query=Bd+Brahim+Roudani+r%C3%A9sidence+les+palmiers+B9+Casablanca" target="_blank" rel="noopener">
           Itinéraire <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h14M13 6l6 6-6 6"/></svg>
         </a>
       </div>
     </div>
-
   </div>
 </section>
 
@@ -833,7 +729,7 @@
 <section class="section section--paper section--tight" id="partenaires">
   <div class="shell">
     <header class="section__head section__head--center">
-      <p class="eyebrow" data-reveal><i>07</i> Nos partenaires</p>
+      <p class="eyebrow" data-reveal><i>06</i> Nos partenaires</p>
       <h2 class="h2 h2--sm" data-reveal data-reveal-delay="80">
         Nous ne faisons pas d'économies <em>sur ce qui tient le bâtiment</em>
       </h2>
@@ -842,24 +738,40 @@
   <div class="marquee" data-reveal>
     <div class="marquee__track">
       <div class="marquee__group">
+        <img src="assets/img/partner-holcim.png" alt="Holcim" loading="lazy">
         <img src="assets/img/partner-lafarge.png" alt="Lafarge" loading="lazy">
         <img src="assets/img/partner-knauf.png" alt="Knauf" loading="lazy">
         <img src="assets/img/partner-sonasid.png" alt="Sonasid" loading="lazy">
         <img src="assets/img/partner-weber.png" alt="Weber Saint-Gobain" loading="lazy">
+        <img src="assets/img/partner-sika.png" alt="Sika" loading="lazy">
+        <img src="assets/img/partner-rockwool.png" alt="Rockwool" loading="lazy">
         <img src="assets/img/partner-soprema.png" alt="Soprema" loading="lazy">
+        <img src="assets/img/partner-legrand.png" alt="Legrand" loading="lazy">
+        <img src="assets/img/partner-carrier.png" alt="Carrier" loading="lazy">
+        <img src="assets/img/partner-geberit.png" alt="Geberit" loading="lazy">
+        <img src="assets/img/partner-jacob-delafon.png" alt="Jacob Delafon" loading="lazy">
+        <img src="assets/img/partner-vicaima.png" alt="Vicaima" loading="lazy">
         <img src="assets/img/partner-alsina.png" alt="Alsina" loading="lazy">
         <img src="assets/img/partner-astral.png" alt="Astral" loading="lazy">
-        <img src="assets/img/partner-vicaima.png" alt="Vicaima" loading="lazy">
+        <img src="assets/img/partner-odassia.png" alt="O'Dassia" loading="lazy">
       </div>
       <div class="marquee__group" aria-hidden="true">
+        <img src="assets/img/partner-holcim.png" alt="" loading="lazy">
         <img src="assets/img/partner-lafarge.png" alt="" loading="lazy">
         <img src="assets/img/partner-knauf.png" alt="" loading="lazy">
         <img src="assets/img/partner-sonasid.png" alt="" loading="lazy">
         <img src="assets/img/partner-weber.png" alt="" loading="lazy">
+        <img src="assets/img/partner-sika.png" alt="" loading="lazy">
+        <img src="assets/img/partner-rockwool.png" alt="" loading="lazy">
         <img src="assets/img/partner-soprema.png" alt="" loading="lazy">
+        <img src="assets/img/partner-legrand.png" alt="" loading="lazy">
+        <img src="assets/img/partner-carrier.png" alt="" loading="lazy">
+        <img src="assets/img/partner-geberit.png" alt="" loading="lazy">
+        <img src="assets/img/partner-jacob-delafon.png" alt="" loading="lazy">
+        <img src="assets/img/partner-vicaima.png" alt="" loading="lazy">
         <img src="assets/img/partner-alsina.png" alt="" loading="lazy">
         <img src="assets/img/partner-astral.png" alt="" loading="lazy">
-        <img src="assets/img/partner-vicaima.png" alt="" loading="lazy">
+        <img src="assets/img/partner-odassia.png" alt="" loading="lazy">
       </div>
     </div>
   </div>
@@ -869,7 +781,7 @@
 <section class="section" id="faq">
   <div class="shell faq">
     <div class="faq__head">
-      <p class="eyebrow" data-reveal><i>08</i> Questions fréquentes</p>
+      <p class="eyebrow" data-reveal><i>07</i> Questions fréquentes</p>
       <h2 class="h2" data-reveal data-reveal-delay="80">Ce que les clients<br><em>nous demandent toujours</em></h2>
       <p data-reveal data-reveal-delay="160">
         Une question qui n'est pas ici ? Appelez-nous, on répond directement.
@@ -898,12 +810,12 @@
         <summary><span>Combien coûte un aménagement au mètre carré ?</span><i aria-hidden="true"></i></summary>
         <div class="qa__body">
           <p>
-            Sur nos projets livrés, un aménagement TCE se situe généralement entre
-            <strong>6 000 et 12 500 DH/m²</strong> selon le niveau de finition, et un
-            gros œuvre de villa autour de <strong>4 500 à 6 000 DH/m²</strong>.
+            Un aménagement TCE se situe généralement entre
+            <strong>2 500 et 12 500 DH/m²</strong> selon le niveau de finition et le
+            standing recherché. Un gros œuvre de villa se situe entre
+            <strong>1 000 et 1 800 DH/m² HT</strong>.
           </p>
           <p>
-            Ces fourchettes viennent de chantiers réels, pas d'un barème théorique.
             Le prix exact dépend de l'état existant, des contraintes techniques et
             des matériaux choisis : c'est précisément ce que la visite et le devis
             détaillé servent à établir.
@@ -954,9 +866,10 @@
         <summary><span>Comment suivre l'avancement sans venir sur place ?</span><i aria-hidden="true"></i></summary>
         <div class="qa__body">
           <p>
-            Un conducteur de travaux dédié vous transmet un point d'avancement régulier :
-            photos du chantier, taux de réalisation par lot, budget consommé et prochaines
-            étapes. Beaucoup de nos clients pilotent leur projet depuis l'étranger.
+            Un conducteur de travaux et un chef de projet dédiés vous transmettent un
+            point d'avancement régulier : photos du chantier, taux de réalisation par lot,
+            budget consommé et prochaines étapes. Beaucoup de nos clients pilotent leur
+            projet depuis l'étranger.
           </p>
         </div>
       </details>
@@ -973,7 +886,7 @@
 
   <div class="shell cta">
     <div class="cta__intro">
-      <p class="eyebrow eyebrow--light" data-reveal><i>09</i> Parlons de votre projet</p>
+      <p class="eyebrow eyebrow--light" data-reveal><i>08</i> Parlons de votre projet</p>
       <h2 class="h2 h2--light" data-reveal data-reveal-delay="80">
         Décrivez votre projet.<br><em>Vous recevez un chiffrage, pas un discours.</em>
       </h2>
@@ -994,7 +907,7 @@
         </li>
         <li data-reveal data-reveal-delay="300">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>
-          <span>Bd 11 janvier, rue Essanober, imm 2 n°12 — Casablanca</span>
+          <span>Bd Brahim Roudani, résidence les palmiers B9, 4<sup>e</sup> étage n°33 — Casablanca</span>
         </li>
       </ul>
     </div>
@@ -1071,7 +984,7 @@
 <footer class="footer">
   <div class="shell footer__grid">
     <div class="footer__brand">
-      <img src="assets/img/logo-light.png" alt="Wolcons" width="743" height="239" loading="lazy">
+      <img src="assets/img/logo.png" alt="Wolcons" width="743" height="239" loading="lazy">
       <p>
         Entreprise générale de construction et d'aménagement tout corps d'état.
         Casablanca · Rabat · Kénitra · Marrakech.
@@ -1109,7 +1022,7 @@
       <h3>Contact</h3>
       <a href="tel:+212661978186">06 61 97 81 86</a>
       <a href="mailto:contact@wolcons.com">contact@wolcons.com</a>
-      <p>Bd 11 janvier, rue Essanober,<br>imm 2 n°12 — Casablanca</p>
+      <p>Bd Brahim Roudani, résidence les palmiers B9,<br>4<sup>e</sup> étage n°33 — Casablanca, Maroc</p>
       <a class="btn btn--primary btn--sm" href="#devis">Demander un devis</a>
     </div>
   </div>
@@ -1129,6 +1042,7 @@
   <svg class="to-top__ring" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="20"/><circle cx="22" cy="22" r="20" data-ring/></svg>
 </button>
 
+<script src="i18n.js" defer></script>
 <script src="script.js" defer></script>
 </body>
 </html>

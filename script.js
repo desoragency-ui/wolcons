@@ -27,6 +27,34 @@
   var finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
   var $  = function (s, c) { return (c || document).querySelector(s); };
+
+  /* Quelques libellés produits par le script lui-même : ils suivent la langue
+     choisie dans le sélecteur (voir i18n.js). */
+  var RUNTIME = {
+    'Ouvrir le menu'        : { en: 'Open menu',   ar: '\u0641\u062a\u062d \u0627\u0644\u0642\u0627\u0626\u0645\u0629' },
+    'Fermer le menu'        : { en: 'Close menu',  ar: '\u0625\u063a\u0644\u0627\u0642 \u0627\u0644\u0642\u0627\u0626\u0645\u0629' },
+    'Merci d\u2019indiquer votre nom.' : {
+      en: 'Please enter your name.',
+      ar: '\u064a\u0631\u062c\u0649 \u0625\u062f\u062e\u0627\u0644 \u0627\u0633\u0645\u0643.'
+    },
+    'Num\u00e9ro incomplet \u2014 nous en avons besoin pour vous rappeler.' : {
+      en: 'Incomplete number \u2014 we need it to call you back.',
+      ar: '\u0631\u0642\u0645 \u063a\u064a\u0631 \u0645\u0643\u062a\u0645\u0644 \u2014 \u0646\u062d\u062a\u0627\u062c\u0647 \u0644\u0645\u0639\u0627\u0648\u062f\u0629 \u0627\u0644\u0627\u062a\u0635\u0627\u0644 \u0628\u0643.'
+    },
+    'Deux champs \u00e0 corriger avant l\u2019envoi.' : {
+      en: 'Two fields to fix before sending.',
+      ar: '\u062d\u0642\u0644\u0627\u0646 \u064a\u062d\u062a\u0627\u062c\u0627\u0646 \u0625\u0644\u0649 \u062a\u0635\u062d\u064a\u062d \u0642\u0628\u0644 \u0627\u0644\u0625\u0631\u0633\u0627\u0644.'
+    },
+    'Bonjour Wolcons, je souhaite un devis.' : {
+      en: 'Hello Wolcons, I would like a quote.',
+      ar: '\u0645\u0631\u062d\u0628\u0627\u064b \u0648\u0644\u0643\u0648\u0646\u0633\u060c \u0623\u0631\u063a\u0628 \u0641\u064a \u0639\u0631\u0636 \u0633\u0639\u0631.'
+    }
+  };
+  function T(fr) {
+    var lang = window.WOLCONS_LANG ? window.WOLCONS_LANG.get() : 'fr';
+    var e = RUNTIME[fr];
+    return (lang !== 'fr' && e && e[lang]) ? e[lang] : fr;
+  }
   var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
   var raf = window.requestAnimationFrame.bind(window);
   var clamp = function (v, a, b) { return Math.min(Math.max(v, a), b); };
@@ -110,16 +138,19 @@
     return out;
   }
 
-  if (!reduced) {
-    $$('.hero__title span, .h2, .statement').forEach(function (el) {
-      if (el.getAttribute('data-nosplit') !== null) return;
-      var frag = splitNode(el, { n: 0 });
-      el.innerHTML = '';
-      el.appendChild(frag);
-      el.setAttribute('data-anim', 'none');   // l'opacité est portée par les mots
-      if (!el.hasAttribute('data-reveal')) el.setAttribute('data-reveal', '');
-    });
+  function splitEl(el) {
+    if (reduced || el.getAttribute('data-nosplit') !== null) return;
+    var frag = splitNode(el, { n: 0 });
+    el.innerHTML = '';
+    el.appendChild(frag);
+    el.setAttribute('data-anim', 'none');   // l'opacité est portée par les mots
+    if (!el.hasAttribute('data-reveal')) el.setAttribute('data-reveal', '');
   }
+
+  // i18n.js rappelle cette fonction après avoir réécrit un titre traduit.
+  window.__wolconsSplit = splitEl;
+
+  if (!reduced) $$('.hero__title span, .h2, .statement').forEach(splitEl);
 
   /* --------------------------------------------- 4. Révélation au défilement */
   var revealables = $$('[data-reveal]');
@@ -352,7 +383,7 @@
   function setMenu(open) {
     if (!menu || !burger) return;
     burger.setAttribute('aria-expanded', String(open));
-    burger.setAttribute('aria-label', open ? 'Fermer le menu' : 'Ouvrir le menu');
+    burger.setAttribute('aria-label', T(open ? 'Fermer le menu' : 'Ouvrir le menu'));
     document.body.style.overflow = open ? 'hidden' : '';
 
     if (open) {
@@ -620,22 +651,22 @@
       var valid = true;
       var first = null;
 
-      if (!data.nom) { setError(nom, 'Merci d’indiquer votre nom.'); valid = false; first = nom; }
+      if (!data.nom) { setError(nom, T('Merci d’indiquer votre nom.')); valid = false; first = nom; }
       else setError(nom, '');
 
       if (!data.tel || data.tel.replace(/\D/g, '').length < 9) {
-        setError(tel, 'Numéro incomplet — nous en avons besoin pour vous rappeler.');
+        setError(tel, T('Numéro incomplet — nous en avons besoin pour vous rappeler.'));
         valid = false; first = first || tel;
       } else setError(tel, '');
 
       if (!valid) {
-        if (status) status.textContent = 'Deux champs à corriger avant l’envoi.';
+        if (status) status.textContent = T('Deux champs à corriger avant l’envoi.');
         if (first) first.focus();
         return;
       }
 
       var lines = [
-        'Bonjour Wolcons, je souhaite un devis.', '',
+        T('Bonjour Wolcons, je souhaite un devis.'), '',
         'Nom : ' + data.nom,
         'Téléphone : ' + data.tel,
         'Type de projet : ' + (data.type || '—'),

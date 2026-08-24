@@ -845,3 +845,112 @@ span.sw > i{
   .preloader__mark path{animation:none;stroke-dashoffset:0}
   .to-top{transition:opacity .2s}
 }
+
+/* ==========================================================================
+   SÉLECTEUR DE LANGUE
+   ========================================================================== */
+.lang{
+  display:inline-flex;align-items:center;gap:.1rem;
+  padding:.3rem .45rem;
+  border:1.5px solid rgba(255,255,255,.35);border-radius:var(--radius);
+  background:rgba(255,255,255,.1);
+  transition:background var(--dur) var(--ease),border-color var(--dur) var(--ease);
+}
+.lang__globe{
+  width:17px;height:17px;flex:none;margin-inline-end:.3rem;
+  fill:none;stroke:#fff;stroke-width:1.5;
+  transition:stroke var(--dur) var(--ease);
+}
+.lang__btn{
+  min-width:36px;min-height:40px;padding:.25rem .4rem;
+  background:transparent;border:0;border-radius:2px;cursor:pointer;
+  color:rgba(255,255,255,.78);
+  font-family:var(--font-head);font-weight:600;font-size:.8rem;letter-spacing:.05em;
+  transition:background var(--dur) var(--ease),color var(--dur) var(--ease);
+  touch-action:manipulation;
+}
+.lang__btn:hover{color:#fff}
+.lang__btn.is-on{background:var(--orange);color:#fff}
+
+.header.is-stuck .lang{border-color:var(--line);background:var(--navy-100)}
+.header.is-stuck .lang__globe{stroke:var(--navy)}
+.header.is-stuck .lang__btn{color:var(--slate)}
+.header.is-stuck .lang__btn:hover{color:var(--navy)}
+.header.is-stuck .lang__btn.is-on{background:var(--orange);color:#fff}
+
+.lang--menu{justify-content:center;border-color:var(--line-dark);background:rgba(255,255,255,.06)}
+
+@media (max-width:479px){
+  .lang__globe{display:none}
+  .lang{padding:.25rem .3rem}
+  .lang__btn{min-width:32px;font-size:.74rem;padding:.25rem .25rem}
+}
+
+/* ==========================================================================
+   LOGO — plus grand, couleurs d'origine en haut et en bas
+   Un halo blanc très doux garde le bleu marine lisible sur fond sombre,
+   sans altérer les couleurs de la marque.
+   ========================================================================== */
+.header__logo img{
+  height:58px;
+  filter:drop-shadow(0 0 16px rgba(255,255,255,.62)) drop-shadow(0 0 4px rgba(255,255,255,.9));
+}
+.header.is-stuck .header__logo img{height:48px;filter:none}
+.footer__brand img{
+  height:62px;
+  filter:drop-shadow(0 0 18px rgba(255,255,255,.6)) drop-shadow(0 0 5px rgba(255,255,255,.92));
+}
+
+@media (max-width:559px){
+  .header__logo img{height:46px}
+  .header.is-stuck .header__logo img{height:40px}
+  .footer__brand img{height:52px}
+}
+
+/* ==========================================================================
+   BANDEAU CLIENTS — couleurs conservées, défilement gauche → droite
+   ========================================================================== */
+.marquee--color img{filter:none;opacity:1;height:clamp(32px,5vw,50px)}
+.marquee--color img:hover{filter:none;opacity:1;transform:scale(1.05)}
+.marquee--color img{transition:transform var(--dur) var(--ease)}
+.marquee--rtl .marquee__track{animation-name:slideRev}
+@keyframes slideRev{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+
+/* ==========================================================================
+   ARABE — sens de lecture droite → gauche
+   ========================================================================== */
+html[lang="ar"]{
+  --font-head:'Cairo','Outfit',system-ui,sans-serif;
+  --font-body:'Cairo','Inter',system-ui,sans-serif;
+}
+html[lang="ar"] .h2,html[lang="ar"] .hero__title{letter-spacing:0}
+html[lang="ar"] .eyebrow{letter-spacing:.06em}
+
+[dir="rtl"] .statement{border-left:0;border-right:3px solid var(--orange);padding-left:0;padding-right:1.25rem}
+[dir="rtl"] .ticks li{padding-left:0;padding-right:2rem}
+[dir="rtl"] .ticks li::before{left:auto;right:0;transform:rotate(45deg) scaleX(-1)}
+[dir="rtl"] .compare__col li{padding-left:0;padding-right:1.75rem}
+[dir="rtl"] .compare__col li::before{left:auto;right:0}
+[dir="rtl"] .eyebrow i{padding-right:0;padding-left:.65rem}
+[dir="rtl"] .eyebrow i::after{right:auto;left:0}
+[dir="rtl"] .project__badge{left:auto;right:0}
+[dir="rtl"] .about__media::after{left:auto;right:-14px;border-left:0;border-right:3px solid var(--orange)}
+[dir="rtl"] .about__badge{right:auto;left:-.75rem}
+[dir="rtl"] .steps::after,[dir="rtl"] .rule,[dir="rtl"] .step::before{transform-origin:right}
+[dir="rtl"] .img-wrap::after{transform-origin:left}
+[dir="rtl"] .map__card{left:auto;right:1rem}
+[dir="rtl"] .btn svg,[dir="rtl"] .link-arrow svg{transform:scaleX(-1)}
+[dir="rtl"] .btn:hover svg{transform:scaleX(-1) translateX(4px)}
+[dir="rtl"] .link-arrow:hover svg{transform:scaleX(-1) translateX(5px)}
+[dir="rtl"] .mobile-menu nav a:hover{padding-left:0;padding-right:.5rem}
+[dir="rtl"] .footer__col a:not(.btn):hover{padding-left:0;padding-right:.3rem}
+[dir="rtl"] .nav a::after{left:auto;right:0}
+[dir="rtl"] .field select{background-position:left .8rem center;padding-right:.9rem;padding-left:2.5rem}
+[dir="rtl"] .scroll-progress span{margin-left:auto}
+[dir="rtl"] .whatsapp{right:auto;left:1rem}
+[dir="rtl"] .to-top{right:auto;left:1rem}
+
+/* Le passage d'une langue à l'autre ne doit pas rejouer toutes les animations */
+.lang-switching *,.lang-switching *::before,.lang-switching *::after{
+  transition:none!important;animation-duration:.001ms!important;
+}

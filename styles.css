@@ -914,6 +914,8 @@ span.sw > i{
 .marquee--color img:hover{filter:none;opacity:1;transform:scale(1.05)}
 .marquee--color img{transition:transform var(--dur) var(--ease)}
 .marquee--rtl .marquee__track{animation-name:slideRev}
+/* 15 logos au lieu de 8 : durée allongée pour conserver la même vitesse de défilement */
+.marquee--color .marquee__track{animation-duration:66s}
 @keyframes slideRev{from{transform:translateX(-50%)}to{transform:translateX(0)}}
 
 /* ==========================================================================

@@ -58,9 +58,9 @@ La page suit une trame narrative (problème → guide → plan → preuve → ac
 | 04 | Nos métiers | TCE · Construction clé en main · Project management |
 | — | Chiffres | 4 compteurs animés |
 | 05 | Réalisations | 13 projets réels, filtrables par mission |
-| — | Nos clients | Bandeau des 7 logos clients, en couleur, défilement gauche → droite |
+| — | Nos clients | Bandeau des 15 logos clients, en couleur, défilement gauche → droite |
 | — | Carte | Plan d'accès + adresse |
-| 06 | Partenaires | Bandeau défilant des 16 fournisseurs (niveaux de gris) |
+| 06 | Partenaires | Bandeau défilant des 8 fournisseurs (niveaux de gris) |
 | 07 | Questions fréquentes | Accordéon — rôle pédagogique (TCE, prix au m², avenants) |
 | 08 | Demander un devis | Formulaire + coordonnées |
 
@@ -152,7 +152,12 @@ champs et l'affichage d'état sont déjà en place.
    modifier les couleurs de la marque. Si le rendu ne convient pas, deux options :
    augmenter le halo, ou revenir à `logo-light.png` (mot-symbole blanc, marque orange)
    qui est toujours dans `assets/img/`.
-6. **LinkedIn** — l'ancien site pointait vers une URL d'administration ; remplacée
+6. **Liste clients** — les 15 logos du bandeau « Ils nous font confiance » sont
+   ceux fournis par le client. Plusieurs sont des fabricants de matériaux
+   (Sika, Rockwool, Legrand, Carrier, Geberit, Jacob Delafon, Holcim, O'Dassia) :
+   confirmer qu'il s'agit bien de donneurs d'ordre et non de fournisseurs, et
+   vérifier l'autorisation d'utiliser chaque marque.
+7. **LinkedIn** — l'ancien site pointait vers une URL d'administration ; remplacée
    par l'URL publique `linkedin.com/company/106527329/`. À vérifier.
 
 ## Visuels
@@ -164,10 +169,15 @@ Wolcons), recadrées, harmonisées et réencodées en WebP.
 de `wolcons.com`, où chaque titre de projet précède immédiatement son visuel. Les
 13 fiches correspondent donc à l'ordre officiel du site d'origine.
 
-**Logos** : logotype Wolcons et 16 logos fournisseurs détourés (fond transparent)
-dans `assets/img/` ; 7 logos clients dans `assets/img/clients/`, détourés et
+**Logos** : logotype Wolcons et 8 logos fournisseurs détourés (fond transparent)
+dans `assets/img/` ; **15 logos clients** dans `assets/img/clients/`, détourés et
 conservés **en couleur**. `logo-light.png` est la version à mot-symbole blanc,
 conservée au cas où.
+
+Pour ajouter un client : déposer le PNG détouré (hauteur 140 px) dans
+`assets/img/clients/` et ajouter une ligne `<img>` dans **les deux**
+`.marquee__group` de la section `#clients` — le second groupe est la copie
+qui rend le défilement continu, ses `alt` restent vides.
 
 Remplacer une image = déposer un fichier de même nom dans le même dossier.
 

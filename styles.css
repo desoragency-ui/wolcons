@@ -975,3 +975,73 @@ html[lang="ar"] .eyebrow{letter-spacing:.06em}
 .lang-switching *,.lang-switching *::before,.lang-switching *::after{
   transition:none!important;animation-duration:.001ms!important;
 }
+
+/* ==========================================================================
+   CARROUSEL DE PROJET
+   Un projet qui compte plusieurs photos devient une galerie glissable.
+   Les internes restent en lecture gauche → droite, y compris en arabe.
+   ========================================================================== */
+.project__media.pcar{position:relative;direction:ltr}
+
+.pcar__viewport{overflow:hidden;touch-action:pan-y}
+.pcar__viewport:focus-visible{outline:3px solid var(--orange);outline-offset:-3px}
+
+.pcar__track{
+  display:flex;margin:0;padding:0;list-style:none;
+  transition:transform .6s var(--ease-expo);will-change:transform;
+}
+.pcar__slide{flex:0 0 100%;min-width:0}
+.pcar__slide img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
+
+/* Flèches */
+.pcar__nav{
+  position:absolute;top:50%;translate:0 -50%;z-index:3;
+  display:grid;place-content:center;width:40px;height:40px;
+  background:rgba(255,255,255,.92);border:0;border-radius:50%;
+  color:var(--navy);cursor:pointer;opacity:0;
+  box-shadow:0 6px 18px -8px rgba(9,32,48,.6);
+  transition:opacity .3s var(--ease),background .2s var(--ease),transform .2s var(--ease);
+}
+.pcar__nav svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.pcar__nav--prev{left:.65rem}
+.pcar__nav--next{right:.65rem}
+.pcar__nav:hover{background:#fff;transform:scale(1.08)}
+.pcar__nav:active{transform:scale(.94)}
+.project:hover .pcar__nav,
+.pcar__nav:focus-visible,
+.pcar__viewport:focus-visible ~ .pcar__nav{opacity:1}
+@media (hover:none){ .pcar__nav{opacity:.92} }
+
+/* Puces */
+.pcar__dots{
+  position:absolute;left:0;right:0;bottom:.6rem;z-index:3;
+  display:flex;justify-content:center;gap:.3rem;
+}
+.pcar__dot{
+  position:relative;width:18px;height:3px;padding:0;border:0;border-radius:2px;
+  background:rgba(255,255,255,.6);cursor:pointer;
+  transition:background var(--dur) var(--ease),width var(--dur) var(--ease);
+}
+.pcar__dot::after{content:'';position:absolute;inset:-16px -4px}
+.pcar__dot.is-on{background:var(--orange);width:28px}
+
+/* Compteur */
+.pcar__count{
+  position:absolute;right:.6rem;bottom:.5rem;z-index:3;
+  padding:.16rem .45rem;border-radius:2px;
+  background:rgba(6,37,55,.75);color:#fff;
+  font-family:var(--font-head);font-weight:600;font-size:.7rem;
+  font-variant-numeric:tabular-nums;letter-spacing:.03em;
+}
+.project__badge{z-index:4}
+
+/* Révélation au défilement : le volet et le dézoom valent aussi pour les diapositives */
+.img-wrap .pcar__slide img{transform:scale(1.16);transition:transform 1.5s var(--ease-expo)}
+.img-wrap.is-in .pcar__slide img{transform:none}
+/* pas de zoom au survol sur un carrousel : la photo doit rester stable pour glisser */
+.project:hover .pcar__slide img{transform:none}
+
+@media (prefers-reduced-motion:reduce){
+  .pcar__track{transition:none}
+  .img-wrap .pcar__slide img{transform:none!important}
+}

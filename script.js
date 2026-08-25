@@ -466,6 +466,70 @@
     });
   });
 
+  /* ------------------------------------- 11 bis. Carrousels de projet ------
+     Chaque projet qui compte plusieurs photos devient une galerie : flèches,
+     puces, balayage tactile et flèches du clavier. Boucle infinie.
+  ------------------------------------------------------------------------- */
+  $$('.pcar').forEach(function (car) {
+    var viewport = $('[data-pcar]', car);
+    var track    = $('[data-pcar-track]', car);
+    var slides   = $$('.pcar__slide', car);
+    var dots     = $$('[data-pcar-dot]', car);
+    var count    = $('[data-pcar-count]', car);
+    var prev     = $('[data-pcar-prev]', car);
+    var next     = $('[data-pcar-next]', car);
+    if (!track || slides.length < 2) return;
+
+    var index = 0;
+
+    function preload(n) {
+      [n, (n + 1) % slides.length].forEach(function (k) {
+        var img = slides[k] && slides[k].querySelector('img');
+        if (img) img.loading = 'eager';
+      });
+    }
+
+    function go(n) {
+      index = (n + slides.length) % slides.length;
+      track.style.transform = 'translate3d(' + (-index * 100) + '%,0,0)';
+
+      slides.forEach(function (s, k) { s.setAttribute('aria-hidden', String(k !== index)); });
+      dots.forEach(function (d, k) {
+        d.classList.toggle('is-on', k === index);
+        d.setAttribute('aria-current', String(k === index));
+      });
+      if (count) count.textContent = (index + 1) + '/' + slides.length;
+      preload(index);
+    }
+
+    if (prev) prev.addEventListener('click', function () { go(index - 1); });
+    if (next) next.addEventListener('click', function () { go(index + 1); });
+    dots.forEach(function (d) {
+      d.addEventListener('click', function () { go(parseInt(d.getAttribute('data-pcar-dot'), 10) || 0); });
+    });
+
+    if (viewport) {
+      viewport.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight') { e.preventDefault(); go(index + 1); }
+        else if (e.key === 'ArrowLeft') { e.preventDefault(); go(index - 1); }
+      });
+
+      var sx = 0, sy = 0, dragging = false;
+      viewport.addEventListener('touchstart', function (e) {
+        sx = e.touches[0].clientX; sy = e.touches[0].clientY; dragging = true;
+      }, { passive: true });
+      viewport.addEventListener('touchend', function (e) {
+        if (!dragging) return;
+        dragging = false;
+        var dx = e.changedTouches[0].clientX - sx;
+        var dy = e.changedTouches[0].clientY - sy;
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) go(index + (dx < 0 ? 1 : -1));
+      }, { passive: true });
+    }
+
+    go(0);
+  });
+
   /* -------------------------------------------------- 12. Accordéon animé */
   var accordion = $('[data-accordion]');
 

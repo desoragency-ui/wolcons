@@ -9,8 +9,13 @@ wolcons/
 ├── index.html      Page unique (9 sections + header/footer)
 ├── styles.css      Design system, composants, moteur d'animation, RTL, responsive
 ├── i18n.js         Dictionnaires FR / EN / AR + sélecteur de langue
-├── script.js       Animations, filtres, accordéon, formulaire
-└── assets/img/     Visuels WebP, logos partenaires + clients PNG détourés
+├── script.js       Animations, filtres, carrousels, accordéon, formulaire
+├── tools/
+│   └── build-projets.py   Régénère les carrousels de la section Réalisations
+└── assets/img/
+    ├── projets/<slug>/    Photos de chaque projet (01.webp, 02.webp, …)
+    ├── clients/           15 logos clients détourés, en couleur
+    └── partner-*.png      8 logos fournisseurs détourés
 ```
 
 ## Lancer en local
@@ -61,7 +66,7 @@ La page suit une trame narrative (problème → guide → plan → preuve → ac
 | 03 | La méthode Wolcons | 4 étapes + tableau comparatif « sans / avec » |
 | 04 | Nos métiers | TCE · Construction clé en main · Project management |
 | — | Chiffres | 4 compteurs animés |
-| 05 | Réalisations | 13 projets réels, filtrables par mission |
+| 05 | Réalisations | 13 projets réels, filtrables ; carrousel de photos par projet |
 | — | Accès | Carte Google + adresse et horaires |
 | 06 | Partenaires | Bandeau défilant des 8 fournisseurs (niveaux de gris) |
 | 07 | Questions fréquentes | Accordéon — rôle pédagogique (TCE, prix au m², avenants) |
@@ -85,6 +90,7 @@ et **une seule boucle `requestAnimationFrame`** pour le défilement.
 - Menu mobile : ouverture avec liens décalés
 - Accordéon FAQ : hauteur animée (Web Animations API)
 - Deux bandeaux défilants : clients (couleur, gauche → droite) et fournisseurs
+- Carrousels de projet : glissement, puces, compteur, boucle
 - Barre de progression de lecture + bouton retour en haut avec anneau
 
 `prefers-reduced-motion: reduce` **désactive tout**, y compris le préchargeur,
@@ -113,6 +119,31 @@ mobile, où le panneau s'ouvre vers le haut.
 Ouvrir `i18n.js` → objet `DICT` → sections `en` et `ar`. La clé est la phrase
 française **exacte** (espaces normalisés). Pour traduire une nouvelle phrase,
 copier le texte français depuis `index.html` et l'ajouter comme clé.
+
+## Photos des projets
+
+Chaque projet a son dossier : `assets/img/projets/<slug>/`. Un projet qui compte
+plusieurs photos devient automatiquement un **carrousel** (flèches, puces,
+compteur, balayage tactile, flèches du clavier, boucle infinie). Avec une seule
+photo, il reste un visuel fixe, sans contrôle.
+
+### Ajouter des photos à un projet
+
+1. Déposer les fichiers (jpg, png ou webp) dans `assets/img/projets/<slug>/`.
+   Pour imposer l'ordre, préfixer les noms : `01_facade.jpg`, `02_salon.jpg`…
+2. Lancer :
+
+```bash
+python tools/build-projets.py
+```
+
+Le script recadre chaque photo en 1200 × 900 WebP, renumérote tout en
+`01.webp`, `02.webp`, … puis réécrit le balisage des carrousels dans
+`index.html`. Les fichiers déjà normalisés ne sont pas réencodés.
+
+Slugs disponibles : `ambassade`, `novares-usine`, `riad-pru`, `saint-louis`,
+`huawei`, `showroom-tp`, `villa-cs`, `villa-e`, `villa-ib`, `ish`,
+`novares-siege`, `villa-mw`, `hangar`.
 
 ## Responsive & accessibilité
 

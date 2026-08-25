@@ -160,18 +160,61 @@ Slugs disponibles : `ambassade`, `novares-usine`, `riad-pru`, `saint-louis`,
 
 ## Formulaire de devis
 
-Le site étant statique, l'envoi ouvre **WhatsApp** avec le message pré-rempli
-(canal le plus réactif au Maroc), avec repli e-mail affiché après soumission.
-Numéro et adresse en haut de `script.js` :
+La demande part **par e-mail** vers `contact@wolcons.com` via
+[FormSubmit](https://formsubmit.co) : service gratuit, sans compte, sans clé
+d'API, sans limite de volume. Le site reste 100 % statique.
+
+### Activation — une seule fois, 30 secondes
+
+À la **toute première demande** envoyée depuis le site, FormSubmit expédie un
+e-mail de confirmation à `contact@wolcons.com`. Un clic sur le lien de cet
+e-mail active l'adresse **définitivement**. Tant que ce clic n'a pas eu lieu,
+les demandes ne sont pas transmises.
+
+> Faire soi-même un premier envoi de test depuis le formulaire, puis cliquer
+> sur le lien reçu. C'est tout.
+
+### Masquer l'adresse e-mail (recommandé, après activation)
+
+L'e-mail de confirmation contient une **chaîne aléatoire** propre à ce
+formulaire. La coller dans `script.js` à la place de l'adresse évite d'exposer
+`contact@wolcons.com` aux robots de spam :
 
 ```js
-var WHATSAPP = '212661978186';
-var EMAIL    = 'contact@wolcons.com';
+var FORM_ENDPOINT = 'https://formsubmit.co/ajax/' + EMAIL;   // avant
+var FORM_ENDPOINT = 'https://formsubmit.co/ajax/xxxxxxxxxxxxxxxx';  // après
 ```
 
-Pour brancher un vrai back-end (Formspree, Netlify Forms, API maison) : remplacer
-le `window.open(...)` de la section 14 par un `fetch()` POST. La validation des
-champs et l'affichage d'état sont déjà en place.
+### Ce que reçoit Wolcons
+
+Un e-mail titré `Demande de devis — <nom> (<type de projet>)`, présenté en
+tableau : nom, téléphone, type de projet, ville, surface, démarrage souhaité,
+description, langue de navigation et page d'origine.
+
+### Aucune demande ne se perd
+
+- **Envoi réussi** → message de confirmation + bouton « Envoyer aussi sur
+  WhatsApp » (le visiteur choisit, rien ne s'ouvre tout seul).
+- **Service indisponible** → le message bascule sur un lien WhatsApp
+  pré-rempli **et** un lien `mailto:` pré-rempli.
+- **Robots** → un champ piège invisible (`_honey`) : s'il est rempli, rien
+  n'est envoyé et le robot voit un faux message de succès.
+
+Les libellés d'état suivent la langue choisie (FR / EN / AR).
+
+### Changer d'adresse ou de numéro
+
+En haut de la section 14 de `script.js` :
+
+```js
+var WHATSAPP      = '212661978186';
+var EMAIL         = 'contact@wolcons.com';
+var FORM_ENDPOINT = 'https://formsubmit.co/ajax/' + EMAIL;
+```
+
+Pour passer à un autre service (Formspree, Netlify Forms, API maison), il
+suffit de remplacer `FORM_ENDPOINT` : la validation, l'état d'envoi et les
+replis restent identiques.
 
 ## ⚠ À valider avec le client avant mise en ligne
 
@@ -192,7 +235,10 @@ champs et l'affichage d'état sont déjà en place.
    (Sika, Rockwool, Legrand, Carrier, Geberit, Jacob Delafon, Holcim, O'Dassia) :
    confirmer qu'il s'agit bien de donneurs d'ordre et non de fournisseurs, et
    vérifier l'autorisation d'utiliser chaque marque.
-7. **LinkedIn** — l'ancien site pointait vers une URL d'administration ; remplacée
+7. **Activation FormSubmit** — le formulaire n'enverra rien tant que le lien de
+   confirmation reçu sur `contact@wolcons.com` n'aura pas été cliqué. À faire
+   avant la mise en ligne (voir « Formulaire de devis »).
+8. **LinkedIn** — l'ancien site pointait vers une URL d'administration ; remplacée
    par l'URL publique `linkedin.com/company/106527329/`. À vérifier.
 
 ## Visuels

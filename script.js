@@ -48,6 +48,30 @@
     'Bonjour Wolcons, je souhaite un devis.' : {
       en: 'Hello Wolcons, I would like a quote.',
       ar: '\u0645\u0631\u062d\u0628\u0627\u064b \u0648\u0644\u0643\u0648\u0646\u0633\u060c \u0623\u0631\u063a\u0628 \u0641\u064a \u0639\u0631\u0636 \u0633\u0639\u0631.'
+    },
+    'Envoi en cours\u2026' : {
+      en: 'Sending\u2026',
+      ar: '\u062c\u0627\u0631\u064d \u0627\u0644\u0625\u0631\u0633\u0627\u0644\u2026'
+    },
+    'Demande envoy\u00e9e. Nous vous rappelons rapidement.' : {
+      en: 'Request sent. We will call you back shortly.',
+      ar: '\u062a\u0645 \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0637\u0644\u0628. \u0633\u0646\u0639\u0627\u0648\u062f \u0627\u0644\u0627\u062a\u0635\u0627\u0644 \u0628\u0643 \u0642\u0631\u064a\u0628\u0627\u064b.'
+    },
+    'Envoyer aussi sur WhatsApp' : {
+      en: 'Also send on WhatsApp',
+      ar: '\u0623\u0631\u0633\u0644 \u0623\u064a\u0636\u0627\u064b \u0639\u0628\u0631 \u0648\u0627\u062a\u0633\u0627\u0628'
+    },
+    'Envoi impossible pour le moment.' : {
+      en: 'Sending failed for now.',
+      ar: '\u062a\u0639\u0630\u0631 \u0627\u0644\u0625\u0631\u0633\u0627\u0644 \u062d\u0627\u0644\u064a\u0627\u064b.'
+    },
+    'Passez par WhatsApp\u00a0:' : {
+      en: 'Use WhatsApp instead:',
+      ar: '\u0627\u0633\u062a\u0639\u0645\u0644 \u0648\u0627\u062a\u0633\u0627\u0628\u00a0:'
+    },
+    'ou \u00e9crivez \u00e0' : {
+      en: 'or write to',
+      ar: '\u0623\u0648 \u0627\u0643\u062a\u0628 \u0625\u0644\u0649'
     }
   };
   function T(fr) {
@@ -682,11 +706,20 @@
   }
 
   /* ------------------------------------------------- 14. Formulaire de devis
-     Site statique : la demande part sur WhatsApp (canal le plus réactif au
-     Maroc) avec repli e-mail. Pour brancher un back-end, voir le README.
+     La demande part par e-mail via FormSubmit (service gratuit, sans compte :
+     l'adresse ci-dessous reçoit un e-mail de confirmation à la première
+     demande, un clic suffit à l'activer définitivement).
+
+     Après activation, FormSubmit fournit une chaîne aléatoire à utiliser à la
+     place de l'adresse : la remplacer dans FORM_ENDPOINT évite d'exposer
+     l'e-mail aux robots de spam.
+
+     WhatsApp reste proposé juste après l'envoi, et sert de repli si le service
+     est indisponible : aucune demande ne se perd.
   ------------------------------------------------------------------------- */
-  var WHATSAPP = '212661978186';
-  var EMAIL    = 'contact@wolcons.com';
+  var WHATSAPP      = '212661978186';
+  var EMAIL         = 'contact@wolcons.com';
+  var FORM_ENDPOINT = 'https://formsubmit.co/ajax/' + EMAIL;
 
   var form   = $('[data-form]');
   var status = $('[data-status]');
@@ -697,6 +730,12 @@
     wrap.classList.toggle('has-error', Boolean(msg));
     var out = $('[data-error]', wrap);
     if (out) out.textContent = msg || '';
+  }
+
+  function say(msg, state) {
+    if (!status) return;
+    status.className = 'form__status' + (state ? ' is-' + state : '');
+    status.textContent = msg;
   }
 
   if (form) {
@@ -710,21 +749,24 @@
       var data = {};
       $$('input, select, textarea', form).forEach(function (el) { data[el.name] = el.value.trim(); });
 
+      // Le piège à robots est rempli : on fait comme si tout allait bien.
+      if (data._honey) { say(T('Demande envoy\u00e9e. Nous vous rappelons rapidement.'), 'ok'); form.reset(); return; }
+
       var nom = $('#f-nom');
       var tel = $('#f-tel');
       var valid = true;
       var first = null;
 
-      if (!data.nom) { setError(nom, T('Merci d’indiquer votre nom.')); valid = false; first = nom; }
+      if (!data.nom) { setError(nom, T('Merci d\u2019indiquer votre nom.')); valid = false; first = nom; }
       else setError(nom, '');
 
       if (!data.tel || data.tel.replace(/\D/g, '').length < 9) {
-        setError(tel, T('Numéro incomplet — nous en avons besoin pour vous rappeler.'));
+        setError(tel, T('Num\u00e9ro incomplet \u2014 nous en avons besoin pour vous rappeler.'));
         valid = false; first = first || tel;
       } else setError(tel, '');
 
       if (!valid) {
-        if (status) status.textContent = T('Deux champs à corriger avant l’envoi.');
+        say(T('Deux champs \u00e0 corriger avant l\u2019envoi.'), 'ko');
         if (first) first.focus();
         return;
       }
@@ -732,23 +774,76 @@
       var lines = [
         T('Bonjour Wolcons, je souhaite un devis.'), '',
         'Nom : ' + data.nom,
-        'Téléphone : ' + data.tel,
-        'Type de projet : ' + (data.type || '—'),
-        'Ville : ' + (data.ville || '—'),
-        'Surface : ' + (data.surface || '—'),
-        'Démarrage : ' + (data.delai || '—'), '',
-        'Projet : ' + (data.message || '—')
+        'T\u00e9l\u00e9phone : ' + data.tel,
+        'Type de projet : ' + (data.type || '\u2014'),
+        'Ville : ' + (data.ville || '\u2014'),
+        'Surface : ' + (data.surface || '\u2014'),
+        'D\u00e9marrage : ' + (data.delai || '\u2014'), '',
+        'Projet : ' + (data.message || '\u2014')
       ].join('\n');
 
-      window.open('https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent(lines), '_blank', 'noopener');
+      var waLink = 'https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent(lines);
+      var submitBtn = $('button[type="submit"]', form);
 
-      if (status) {
-        status.innerHTML =
-          'Votre demande est prête dans WhatsApp — il ne reste qu’à l’envoyer. ' +
-          'Vous préférez l’e-mail ? <a href="mailto:' + EMAIL +
-          '?subject=' + encodeURIComponent('Demande de devis — ' + data.nom) +
-          '&body=' + encodeURIComponent(lines) + '">Écrire à ' + EMAIL + '</a>';
+      if (submitBtn) submitBtn.disabled = true;
+      say(T('Envoi en cours\u2026'));
+
+      function whatsappButton() {
+        var a = document.createElement('a');
+        a.className = 'btn btn--primary btn--sm';
+        a.href = waLink;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = T('Envoyer aussi sur WhatsApp');
+        return a;
       }
+
+      function done() {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+
+      function fallback() {
+        done();
+        say(T('Envoi impossible pour le moment.') + ' ' + T('Passez par WhatsApp\u00a0:'), 'ko');
+        status.appendChild(whatsappButton());
+        status.appendChild(document.createTextNode(' ' + T('ou \u00e9crivez \u00e0') + ' '));
+        var mail = document.createElement('a');
+        mail.href = 'mailto:' + EMAIL +
+          '?subject=' + encodeURIComponent('Demande de devis \u2014 ' + data.nom) +
+          '&body=' + encodeURIComponent(lines);
+        mail.textContent = EMAIL;
+        status.appendChild(mail);
+      }
+
+      fetch(FORM_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          _subject : 'Demande de devis \u2014 ' + data.nom + ' (' + (data.type || 'projet') + ')',
+          _template: 'table',
+          _captcha : 'false',
+          Nom      : data.nom,
+          Telephone: data.tel,
+          Type     : data.type || '',
+          Ville    : data.ville || '',
+          Surface  : data.surface || '',
+          Demarrage: data.delai || '',
+          Projet   : data.message || '',
+          Langue   : window.WOLCONS_LANG ? window.WOLCONS_LANG.get() : 'fr',
+          Page     : window.location.href
+        })
+      })
+        .then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        })
+        .then(function () {
+          done();
+          form.reset();
+          say(T('Demande envoy\u00e9e. Nous vous rappelons rapidement.'), 'ok');
+          status.appendChild(whatsappButton());
+        })
+        .catch(fallback);
     });
   }
 

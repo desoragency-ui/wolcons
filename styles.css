@@ -1045,3 +1045,13 @@ html[lang="ar"] .eyebrow{letter-spacing:.06em}
   .pcar__track{transition:none}
   .img-wrap .pcar__slide img{transform:none!important}
 }
+
+/* ==========================================================================
+   FORMULAIRE — envoi
+   ========================================================================== */
+.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none}
+.btn[disabled]{opacity:.55;cursor:progress;pointer-events:none}
+.form__status.is-ok{color:var(--navy)}
+.form__status.is-ko{color:var(--orange-600)}
+.form__status .btn{margin-top:.75rem}
+.form__status a:not(.btn){color:var(--orange);font-weight:600;border-bottom:1.5px solid currentColor}

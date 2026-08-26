@@ -57,6 +57,45 @@ PROJECTS = [
 MEDIA_RE = re.compile(r'        <div class="project__media[^"]*">[\s\S]*?\n        </div>')
 
 
+def trim_black(im, thr=24, keep=0.12):
+    """Retire les bandes noires des captures d'ecran (letterbox, barre d'accueil).
+
+       On repere les lignes et colonnes qui portent du contenu, puis on garde la
+       plus longue plage continue : une fine barre claire isolee au bord (barre
+       d'accueil d'un telephone) est ainsi ecartee avec la bande noire qui la
+       precede. Le recadrage est abandonne s'il retire trop d'image."""
+    g = im.convert('L')
+    w, h = g.size
+    px = g.load()
+    sx = max(1, w // 200)
+    sy = max(1, h // 200)
+
+    def longest(flags):
+        best = (0, -1, -1)
+        run_start = None
+        for i, on in enumerate(flags + [False]):
+            if on and run_start is None:
+                run_start = i
+            elif not on and run_start is not None:
+                if i - run_start > best[0]:
+                    best = (i - run_start, run_start, i - 1)
+                run_start = None
+        return best[1], best[2]
+
+    rows = [max(px[x, y] for x in range(0, w, sx)) > thr for y in range(h)]
+    cols = [max(px[x, y] for y in range(0, h, sy)) > thr for x in range(w)]
+
+    top, bottom = longest(rows)
+    left, right = longest(cols)
+    if top < 0 or left < 0:
+        return im
+    if (bottom - top + 1) < h * keep or (right - left + 1) < w * keep:
+        return im
+    if (top, left, right, bottom) == (0, 0, w - 1, h - 1):
+        return im
+    return im.crop((left, top, right + 1, bottom + 1))
+
+
 def normalise(slug):
     """Recadre, réencode et renumérote les images d'un projet. Retourne la liste finale."""
     folder = os.path.join(PROJETS, slug)
@@ -77,6 +116,7 @@ def normalise(slug):
         try:
             im = Image.open(path)
             im = ImageOps.exif_transpose(im).convert('RGB')
+            im = trim_black(im)
             im = ImageOps.fit(im, SIZE, Image.LANCZOS, centering=(0.5, 0.45))
         except Exception as exc:
             print('  ! ignoree (%s) : %s' % (name, exc))

@@ -15,6 +15,7 @@
       /* — Navigation & en-tête — */
       'Aller au contenu principal': 'Skip to main content',
       'Nous sommes': 'About us',
+      'Connaissances': 'Expertise',
       'La méthode': 'Our method',
       'Nos métiers': 'What we do',
       'Réalisations': 'Projects',
@@ -301,6 +302,7 @@
       /* — التنقّل — */
       'Aller au contenu principal': 'الانتقال إلى المحتوى الرئيسي',
       'Nous sommes': 'من نحن',
+      'Connaissances': 'خبرتنا',
       'La méthode': 'منهجيتنا',
       'Nos métiers': 'خدماتنا',
       'Réalisations': 'إنجازاتنا',

@@ -521,6 +521,15 @@ ul,ol,dl,dd{margin:0;padding:0;list-style:none}
 }
 .socials svg{width:19px;height:19px;fill:currentColor;stroke:none}
 .socials a:hover{background:var(--orange);border-color:var(--orange);color:#fff;transform:translateY(-2px)}
+/* Lien discret vers le tableau de bord — masqué par défaut (voir script.js) */
+.footer__dash{
+  margin-inline-start:.75rem;padding-inline-start:.75rem;
+  border-inline-start:1px solid var(--line-dark);
+  opacity:.7;transition:opacity var(--dur) var(--ease);
+}
+.footer__dash:hover,.footer__dash:focus-visible{opacity:1;color:var(--orange)}
+.footer__dash[hidden]{display:none}
+
 .footer__bottom{
   display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;justify-content:space-between;
   padding-block:1.25rem;border-top:1px solid var(--line-dark);font-size:.82rem;

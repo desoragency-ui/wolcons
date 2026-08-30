@@ -847,6 +847,27 @@
     });
   }
 
+  /* ------------------------------------ Raccourci vers le tableau de bord
+
+     ATTENTION — ceci n'est PAS une sécurité. Le site est statique : le lien
+     est masqué, mais /dashboard/ reste joignable en tapant l'adresse, et le
+     code de cette page est lisible par tout le monde. La vraie protection se
+     configure chez l'hébergeur (Cloudflare Access, mot de passe Netlify…).
+     Ce bloc ne fait qu'éviter d'exposer le lien aux visiteurs.
+
+     Afficher le lien sur cet appareil : ajouter ?tdb=1 à l'adresse du site.
+     Le retirer :                        ajouter ?tdb=0.                     */
+  var dashLink = $('[data-dash-link]');
+  if (dashLink) {
+    var KEY = 'wlc_dash_link';
+    try {
+      var flag = new URLSearchParams(location.search).get('tdb');
+      if (flag === '1') localStorage.setItem(KEY, '1');
+      if (flag === '0') localStorage.removeItem(KEY);
+      if (localStorage.getItem(KEY) === '1') dashLink.hidden = false;
+    } catch (e) { /* stockage indisponible : le lien reste masqué */ }
+  }
+
   /* --------- Si l'utilisateur active « mouvement réduit » en cours de route */
   var onMotionChange = function () {
     if (!motionQuery.matches) return;

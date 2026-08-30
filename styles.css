@@ -318,13 +318,6 @@ ul,ol,dl,dd{margin:0;padding:0;list-style:none}
   content:'';position:absolute;inset:auto auto -14px -14px;width:96px;height:96px;
   border-left:3px solid var(--orange);border-bottom:3px solid var(--orange);
 }
-.about__badge{
-  position:absolute;right:-.75rem;top:1.5rem;
-  background:var(--orange);color:#fff;padding:.9rem 1.15rem;border-radius:var(--radius);
-  display:grid;box-shadow:var(--shadow-2);
-}
-.about__badge strong{font-family:var(--font-head);font-size:1.35rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
-.about__badge span{font-size:.74rem;opacity:.92}
 .about__body .h2{font-size:clamp(1.5rem,3.6vw,2.4rem)}
 
 .ticks{display:grid;gap:.75rem;margin:var(--s3) 0 var(--s4)}
@@ -953,7 +946,6 @@ html[lang="ar"] .eyebrow{letter-spacing:.06em}
 [dir="rtl"] .eyebrow i::after{right:auto;left:0}
 [dir="rtl"] .project__badge{left:auto;right:0}
 [dir="rtl"] .about__media::after{left:auto;right:-14px;border-left:0;border-right:3px solid var(--orange)}
-[dir="rtl"] .about__badge{right:auto;left:-.75rem}
 [dir="rtl"] .steps::after,[dir="rtl"] .rule,[dir="rtl"] .step::before{transform-origin:right}
 [dir="rtl"] .img-wrap::after{transform-origin:left}
 [dir="rtl"] .map__card{left:auto;right:1rem}

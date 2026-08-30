@@ -15,6 +15,12 @@
 (function () {
   'use strict';
 
+  /* Adresse du collecteur, côté lecture. Vide = pas de serveur : le mode
+     « Données réelles » ne montre alors que l'appareil courant.
+     Une fois les Pages Functions déployées, mettre '/api/events'.
+     Doit rester cohérent avec ENDPOINT dans assets/js/analytics.js. */
+  var ENDPOINT = '';
+
   /* ---------------------------------------------------------- référentiels */
 
   var SOURCES = ['google', 'google-maps', 'linkedin', 'direct', 'instagram', 'facebook', 'bing'];
@@ -367,11 +373,40 @@
 
   /* -------------------------------------------------------------- RÉEL */
 
+  /* Événements de CE navigateur (aucun endpoint configuré). */
   function local(days) {
     var raw = [];
     try { raw = JSON.parse(localStorage.getItem('wlc_events') || '[]'); } catch (e) { raw = []; }
+    return shape(raw, days);
+  }
+
+  /* Événements du SERVEUR, tous appareils confondus. Renvoie une promesse.
+     Sans endpoint, on retombe proprement sur les données de l'appareil. */
+  function remote(days) {
+    if (!ENDPOINT) return Promise.resolve(local(days));
+    return fetch(ENDPOINT + '?days=' + days, { credentials: 'include' })
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function (j) {
+        var out = shape(j.events || [], days);
+        out.server = true;
+        return out;
+      })
+      .catch(function (err) {
+        /* le tableau de bord doit rester lisible même si le collecteur tombe */
+        var out = shape([], days);
+        out.server = true;
+        out.error = String(err.message || err);
+        return out;
+      });
+  }
+
+  /* Met en forme une liste d'événements bruts, quelle qu'en soit l'origine. */
+  function shape(raw, days) {
     var cutoff = Date.now() - days * 864e5;
-    raw = raw.filter(function (e) { return e && e.ts >= cutoff; });
+    raw = (raw || []).filter(function (e) { return e && e.ts >= cutoff; });
 
     var out = emptyShape();
     out.demo = false;
@@ -494,7 +529,7 @@
   }
 
   window.WolconsData = {
-    demo: demo, local: local,
+    demo: demo, local: local, remote: remote, ENDPOINT: ENDPOINT,
     SOURCE_LABEL: SOURCE_LABEL, SECTION_LABEL: SECTION_LABEL, EVENT_LABEL: EVENT_LABEL,
     TYPES: TYPES, CITIES: CITIES, DELAYS: DELAYS,
     SURFACE_BANDS: SURFACE_BANDS, BUDGET_BANDS: BUDGET_BANDS, RATE: RATE,

@@ -1153,9 +1153,20 @@ footer{max-width:1620px;margin:0 auto;padding:1.3rem var(--pad) 2.5rem;font-size
   }
 
   /* ---------------------------------------------------------------- rendu */
+  var renderSeq = 0;
   function render() {
     readTokens();                       // les slots suivent le mode clair / sombre
-    D = state.src === 'demo' ? W.demo(state.days) : W.local(state.days);
+    if (state.src === 'demo') return paint(W.demo(state.days));
+    /* la source serveur est asynchrone : on numérote les rendus pour qu'une
+       réponse lente n'écrase pas un choix plus récent de l'utilisateur */
+    var seq = ++renderSeq;
+    return Promise.resolve(W.remote(state.days)).then(function (data) {
+      if (seq === renderSeq) paint(data);
+    });
+  }
+
+  function paint(data) {
+    D = data;
 
     var badge = document.getElementById('modeBadge');
     var banner = document.getElementById('banner');
@@ -1170,15 +1181,25 @@ footer{max-width:1620px;margin:0 auto;padding:1.3rem var(--pad) 2.5rem;font-size
         'pour voir les événements réellement enregistrés sur cet appareil.';
     } else {
       badge.className = 'mode mode--live';
-      badge.textContent = 'Données réelles (cet appareil)';
-      if (D.empty) {
-        btxt.innerHTML = '<b>Aucun événement enregistré pour l’instant.</b> Ouvrez le site, parcourez quelques ' +
-          'sections, puis revenez : visites, clics WhatsApp, appels et demandes de devis apparaîtront ici. ' +
-          'Les données restent sur cet appareil tant qu’aucun <code>ENDPOINT</code> n’est configuré dans <code>analytics.js</code>.';
+      badge.textContent = D.server ? 'Données réelles (serveur)' : 'Données réelles (cet appareil)';
+      if (D.error) {
+        btxt.innerHTML = '<b>Le collecteur n’a pas répondu.</b> Les chiffres affichés sont vides — ' +
+          'ce n’est pas une absence de trafic, c’est une erreur de liaison (<code>' + esc(D.error) +
+          '</code>). Vérifiez que la fonction <code>/api/events</code> est déployée et que la base est liée.';
+      } else if (D.empty) {
+        btxt.innerHTML = D.server
+          ? '<b>Le collecteur répond, mais n’a encore rien enregistré.</b> Ouvrez le site, parcourez ' +
+            'quelques sections, puis revenez : les visites de tous les appareils apparaîtront ici.'
+          : '<b>Aucun événement enregistré pour l’instant.</b> Ouvrez le site, parcourez quelques ' +
+            'sections, puis revenez : visites, clics WhatsApp, appels et demandes de devis apparaîtront ici. ' +
+            'Les données restent sur cet appareil tant qu’aucun <code>ENDPOINT</code> n’est configuré dans <code>analytics.js</code>.';
       } else {
-        btxt.innerHTML = '<b>' + fmt(D.count) + ' événements réels</b> enregistrés dans ce navigateur. ' +
-          'Ce sont de vraies interactions, pas un échantillon — mais uniquement celles de cet appareil, ' +
-          'tant qu’aucun endpoint serveur n’est branché.';
+        btxt.innerHTML = D.server
+          ? '<b>' + fmt(D.count) + ' événements réels</b> remontés par le collecteur, tous appareils ' +
+            'et tous visiteurs confondus. Ce sont vos vrais chiffres.'
+          : '<b>' + fmt(D.count) + ' événements réels</b> enregistrés dans ce navigateur. ' +
+            'Ce sont de vraies interactions, pas un échantillon — mais uniquement celles de cet appareil, ' +
+            'tant qu’aucun endpoint serveur n’est branché.';
       }
     }
 

@@ -12,7 +12,10 @@
 (function () {
   'use strict';
 
-  var ENDPOINT = '';          // ex. 'https://api.wolcons.com/collect' — vide = local uniquement
+  /* Adresse du collecteur. Vide = les événements ne quittent pas l'appareil.
+     Une fois les Pages Functions déployées, mettre '/api/collect'.
+     Doit rester cohérent avec ENDPOINT dans dashboard/data.js ('/api/events'). */
+  var ENDPOINT = '';
   var KEY = 'wlc_events';
   var CAP = 900;              // tampon circulaire, garde le localStorage petit
 

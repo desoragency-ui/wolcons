@@ -19,7 +19,8 @@
      « Données réelles » ne montre alors que l'appareil courant.
      Une fois les Pages Functions déployées, mettre '/api/events'.
      Doit rester cohérent avec ENDPOINT dans assets/js/analytics.js. */
-  var ENDPOINT = '';
+  var ENDPOINT  = '/api/events';
+  var SETTINGS  = '/api/settings';
 
   /* ---------------------------------------------------------- référentiels */
 
@@ -41,13 +42,52 @@
 
   /* DH/m² indicatifs, repris des fourchettes annoncées dans la FAQ du site.
      Sert uniquement à estimer un ordre de grandeur de pipeline — jamais un prix. */
+  /* Prix indicatifs au m². Ils ne sont PAS inventés : ce sont les médianes des
+     13 réalisations publiées sur le site (surface / budget).
+       fit-out : ISH 6 250 · Huawei 8 750 · Saint-Louis 12 000 ·
+                 Thomas & Piron 10 891 · Riad Pru 15 625      -> ~10 900
+       villas  : Villa CS 4 419 · Villa E 5 806 · Villa IB 5 490 -> ~5 500
+       grands  : Ambassade 10 000 · Usine Novares 8 889        -> ~9 400
+     Le client peut les corriger depuis le tableau de bord : lui seul connaît
+     ses prix du moment, l'historique ne dit que le passé. */
   var RATE = {
-    'Aménagement TCE': 6500,
-    'Construction clé en main': 5000,
-    'Project management': 5500,
-    'Rénovation / réhabilitation': 4200,
-    'Je ne sais pas encore': 4500
+    'Aménagement TCE': 10900,
+    'Construction clé en main': 9400,
+    'Project management': 9400,
+    'Rénovation / réhabilitation': 10900,
+    'Je ne sais pas encore': 8000
   };
+
+  /* Réglages enregistrés côté serveur, donc valables sur tous les appareils. */
+  var CONFIG = { goals: null, rates: null, quoteStatus: {} };
+
+  function loadSettings() {
+    return fetch(SETTINGS, { credentials: 'include' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) {
+        if (!j) return CONFIG;
+        if (j.rates) { CONFIG.rates = j.rates; Object.keys(j.rates).forEach(function (k) { RATE[k] = j.rates[k]; }); }
+        if (j.goals) CONFIG.goals = j.goals;
+        CONFIG.quoteStatus = j.quoteStatus || {};
+        return CONFIG;
+      })
+      .catch(function () { return CONFIG; });
+  }
+
+  function saveSetting(key, value) {
+    return fetch(SETTINGS, {
+      method: 'POST', credentials: 'include',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ key: key, value: value })
+    }).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    }).then(function (j) {
+      if (key === 'rates') Object.keys(j.value).forEach(function (k) { RATE[k] = j.value[k]; });
+      CONFIG[key] = j.value;
+      return j.value;
+    });
+  }
 
   var CITIES = ['Casablanca', 'Rabat', 'Kénitra', 'Marrakech', 'Tanger', 'Mohammedia', 'Autres'];
 
@@ -459,10 +499,13 @@
               out.budgets[bandOfBudget(mdh)] = (out.budgets[bandOfBudget(mdh)] || 0) + 1;
             }
             quoteRows.push({
+              id: e.id || null,
               who: det.who || '—', type: det.type || 'Non précisé', ville: det.ville || 'Non précisée',
               surface: m2, band: m2 ? bandOfSurface(m2) : '—', mdh: mdh,
               delai: det.delai || 'Non précisé', src: e.src, lang: e.lang,
-              when: k, status: 'nouveau'
+              when: k,
+              /* le statut vient du client : lui seul sait si un devis est gagné */
+              status: (e.id && CONFIG.quoteStatus[e.id]) || 'nouveau'
             });
             break;
           case 'section_view':      out.sections[e.d] = (out.sections[e.d] || 0) + 1; break;
@@ -512,12 +555,22 @@
       'Devis envoyé depuis le site': nQuotes
     };
 
+    /* Récurrents : part des visiteurs vus sur plus d'une session. */
+    var perVisitor = {};
+    raw.forEach(function (e) {
+      if (!e.vid || e.t !== 'pageview') return;
+      if (!perVisitor[e.vid]) perVisitor[e.vid] = {};
+      if (e.sid) perVisitor[e.vid][e.sid] = 1;
+    });
+    var vids = Object.keys(perVisitor);
+    var returning = vids.filter(function (v) { return Object.keys(perVisitor[v]).length > 1; }).length;
+
     var sessCount = Object.keys(sessions).length;
     out.engagement = {
       avgTime: times.length ? Math.round(times.reduce(function (a, b) { return a + b; }, 0) / times.length) : 0,
       pagesPerSession: sessCount ? (tv / sessCount).toFixed(2) : '0.00',
       bounce: (out.scroll['25%'] && tv) ? Math.max(0, Math.round((1 - out.scroll['25%'] / tv) * 100)) : 0,
-      returning: 0
+      returning: vids.length ? Math.round(returning / vids.length * 100) : 0
     };
 
     quoteRows.sort(function (a, b) { return a.when < b.when ? 1 : -1; });
@@ -530,6 +583,7 @@
 
   window.WolconsData = {
     demo: demo, local: local, remote: remote, ENDPOINT: ENDPOINT,
+    loadSettings: loadSettings, saveSetting: saveSetting, CONFIG: CONFIG,
     SOURCE_LABEL: SOURCE_LABEL, SECTION_LABEL: SECTION_LABEL, EVENT_LABEL: EVENT_LABEL,
     TYPES: TYPES, CITIES: CITIES, DELAYS: DELAYS,
     SURFACE_BANDS: SURFACE_BANDS, BUDGET_BANDS: BUDGET_BANDS, RATE: RATE,

@@ -12,10 +12,9 @@
 (function () {
   'use strict';
 
-  /* Adresse du collecteur. Vide = les événements ne quittent pas l'appareil.
-     Une fois les Pages Functions déployées, mettre '/api/collect'.
-     Doit rester cohérent avec ENDPOINT dans dashboard/data.js ('/api/events'). */
-  var ENDPOINT = '';
+  /* Adresse du collecteur, sur le même domaine que le site (fonction Vercel).
+     Vider cette chaîne remet le mode « rien ne quitte l'appareil ». */
+  var ENDPOINT = '/api/collect';
   var KEY = 'wlc_events';
   var CAP = 900;              // tampon circulaire, garde le localStorage petit
 
@@ -66,6 +65,21 @@
     } catch (e) { return 'nosession'; }
   })();
 
+  /* Identifiant de visiteur : un nombre au hasard, gardé en localStorage.
+     Ce n'est pas un cookie, il ne part chez personne d'autre, et il ne dit rien
+     de la personne — il sert uniquement à distinguer « déjà venu » de
+     « première fois », que rien d'autre ne permet de savoir. */
+  var VISITOR = (function () {
+    try {
+      var v = localStorage.getItem('wlc_vid');
+      if (!v) {
+        v = Math.random().toString(36).slice(2) + Date.now().toString(36);
+        localStorage.setItem('wlc_vid', v);
+      }
+      return v;
+    } catch (e) { return null; }
+  })();
+
   /* Première visite de la session ? sert à séparer sessions et pages vues */
   var NEW_SESSION = (function () {
     try {
@@ -84,13 +98,14 @@
       src: source(),
       dev: device(),
       path: location.pathname,
-      sid: SESSION
+      sid: SESSION,
+      vid: VISITOR
     };
     var rows = load(); rows.push(ev); save(rows);
     if (ENDPOINT) {
       try {
         navigator.sendBeacon
-          ? navigator.sendBeacon(ENDPOINT, new Blob([JSON.stringify(ev)], { type: 'application/json' }))
+          ? navigator.sendBeacon(ENDPOINT, new Blob([JSON.stringify(ev)], { type: 'text/plain;charset=UTF-8' }))
           : fetch(ENDPOINT, { method: 'POST', body: JSON.stringify(ev), keepalive: true });
       } catch (e) {}
     }

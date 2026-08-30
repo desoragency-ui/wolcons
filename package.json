@@ -1,0 +1,9 @@
+{
+  "name": "wolcons",
+  "private": true,
+  "type": "module",
+  "description": "Site vitrine Wolcons + collecteur analytics (fonctions Vercel).",
+  "dependencies": {
+    "@vercel/postgres": "^0.10.0"
+  }
+}

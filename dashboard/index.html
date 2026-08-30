@@ -144,6 +144,32 @@ main{max-width:1620px;margin:0 auto;padding:var(--pad)}
 .tabs button{padding:.3em .65em;border-radius:var(--r-sm);font-size:.75rem;font-weight:600;color:var(--body);min-height:30px;white-space:nowrap}
 .tabs button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--sh)}
 
+/* ---------- réglages saisis par le client ---------- */
+.cfg{display:grid;gap:.9rem}
+.cfg__grid{display:grid;grid-template-columns:1fr auto;gap:.45rem .7rem;align-items:center}
+.cfg__grid label{font-size:.82rem;color:var(--body)}
+.cfg__grid input{
+  width:96px;padding:.32em .5em;text-align:right;font:inherit;font-size:.85rem;
+  font-variant-numeric:tabular-nums;color:var(--ink);background:var(--bg-2);
+  border:1px solid var(--line);border-radius:var(--r-sm);
+}
+.cfg__grid input:focus-visible{border-color:var(--orange)}
+.cfg__unit{font-size:.72rem;color:var(--muted);white-space:nowrap}
+.cfg__foot{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
+.cfg__save{
+  background:var(--navy);color:#fff;border-radius:var(--r-sm);
+  padding:.45em .9em;font-size:.82rem;font-weight:600;
+}
+:root[data-theme="dark"] .cfg__save{color:#0b141a}
+.cfg__save[disabled]{opacity:.5;cursor:default}
+.cfg__msg{font-size:.78rem;color:var(--muted)}
+.cfg__msg.ok{color:var(--good)} .cfg__msg.ko{color:var(--bad)}
+.cfg__note{font-size:.74rem;color:var(--muted);line-height:1.45}
+select.status{
+  font:inherit;font-size:.78rem;color:var(--ink);background:var(--bg-2);
+  border:1px solid var(--line);border-radius:100px;padding:.2em 1.4em .2em .6em;cursor:pointer;
+}
+
 /* ---------- objectifs ---------- */
 .goals{display:grid;gap:.85rem;margin:0}
 .goal__hd{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;font-size:.8rem}
@@ -301,6 +327,44 @@ footer{max-width:1620px;margin:0 auto;padding:1.3rem var(--pad) 2.5rem;font-size
       <h3>Engagement</h3>
       <p class="card__sub">Qualité des visites</p>
       <dl class="mini" id="mini"></dl>
+    </div>
+
+    <!-- Ce que le collecteur ne peut pas deviner : c'est Wolcons qui le sait. -->
+    <div class="card span-6">
+      <div class="card__hd">
+        <div>
+          <h3>Vos objectifs mensuels</h3>
+          <p class="card__sub">Sur 30 jours. Le tableau de bord compare vos résultats à ces cibles</p>
+        </div>
+      </div>
+      <div class="cfg">
+        <div class="cfg__grid" id="cfgGoals"></div>
+        <div class="cfg__foot">
+          <button class="cfg__save" type="button" id="saveGoals">Enregistrer</button>
+          <span class="cfg__msg" id="msgGoals"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card span-6">
+      <div class="card__hd">
+        <div>
+          <h3>Vos prix indicatifs au m²</h3>
+          <p class="card__sub">Ils servent à estimer le pipeline à partir des surfaces demandées</p>
+        </div>
+      </div>
+      <div class="cfg">
+        <div class="cfg__grid" id="cfgRates"></div>
+        <div class="cfg__foot">
+          <button class="cfg__save" type="button" id="saveRates">Enregistrer</button>
+          <span class="cfg__msg" id="msgRates"></span>
+        </div>
+        <p class="cfg__note">
+          Valeurs de départ calculées sur vos 13 réalisations publiées (budget ÷ surface) :
+          aménagement ≈ 10 900, villas ≈ 5 500, grands ouvrages ≈ 9 400 DH/m².
+          Corrigez-les selon vos prix actuels — tout le pipeline en dépend.
+        </p>
+      </div>
     </div>
 
     <!-- ligne 3 : acquisition -->
@@ -477,8 +541,11 @@ footer{max-width:1620px;margin:0 auto;padding:1.3rem var(--pad) 2.5rem;font-size
     });
   }
 
-  /* Cibles commerciales, en base 30 jours. Modifiez ici : tout le reste suit. */
-  var GOALS_30 = { views: 2500, quotes: 18, contacts: 110, value: 45 };
+  /* Cibles de repli, utilisées tant que le client n'a rien enregistré.
+     Les vraies sont saisies dans la carte « Vos objectifs mensuels » et
+     stockées côté serveur, donc partagées entre tous les appareils. */
+  var GOALS_FALLBACK = { views: 2500, quotes: 18, contacts: 110, value: 45 };
+  function goals() { return (W.CONFIG && W.CONFIG.goals) || GOALS_FALLBACK; }
 
   var state = { src: 'demo', days: 30, decal: false };
   var charts = {};
@@ -666,10 +733,10 @@ footer{max-width:1620px;margin:0 auto;padding:1.3rem var(--pad) 2.5rem;font-size
   function renderGoals() {
     var scale = state.days / 30;
     var rows = [
-      { l: 'Visites',           now: sum('views'),  target: GOALS_30.views * scale,    c: CAT[0], u: '' },
-      { l: 'Contacts entrants', now: contacts(),    target: GOALS_30.contacts * scale, c: CAT[2], u: '' },
-      { l: 'Demandes de devis', now: sum('quotes'), target: GOALS_30.quotes * scale,   c: CAT[1], u: '' },
-      { l: 'Pipeline estimé',   now: sum('value'),  target: GOALS_30.value * scale,    c: CAT[5], u: ' MDH', dec: true }
+      { l: 'Visites',           now: sum('views'),  target: goals().views * scale,    c: CAT[0], u: '' },
+      { l: 'Contacts entrants', now: contacts(),    target: goals().contacts * scale, c: CAT[2], u: '' },
+      { l: 'Demandes de devis', now: sum('quotes'), target: goals().quotes * scale,   c: CAT[1], u: '' },
+      { l: 'Pipeline estimé',   now: sum('value'),  target: goals().value * scale,    c: CAT[5], u: ' MDH', dec: true }
     ];
     document.getElementById('goals').innerHTML = rows.map(function (r) {
       var real = r.target ? r.now / r.target * 100 : 0;      // % réel, peut dépasser 100
@@ -1094,6 +1161,79 @@ footer{max-width:1620px;margin:0 auto;padding:1.3rem var(--pad) 2.5rem;font-size
       }));
   }
 
+  /* ------------------------------------------------- réglages du client
+     Deux formulaires, même mécanique : on peint les champs depuis la config
+     courante, on enregistre, puis on redessine — un prix au m² modifié change
+     tout le pipeline, il faut que ça se voie tout de suite. */
+  var GOAL_FIELDS = [
+    ['views', 'Visites par mois', ''],
+    ['contacts', 'Contacts entrants par mois', ''],
+    ['quotes', 'Demandes de devis par mois', ''],
+    ['value', 'Pipeline visé', 'MDH']
+  ];
+
+  function renderConfig() {
+    var g = goals();
+    document.getElementById('cfgGoals').innerHTML = GOAL_FIELDS.map(function (f) {
+      return '<label for="g-' + f[0] + '">' + f[1] + '</label>' +
+             '<span><input id="g-' + f[0] + '" type="number" min="0" step="1" value="' +
+             esc(g[f[0]]) + '"> <span class="cfg__unit">' + f[2] + '</span></span>';
+    }).join('');
+
+    var rates = (W.CONFIG && W.CONFIG.rates) || W.RATE;
+    document.getElementById('cfgRates').innerHTML = Object.keys(W.RATE).map(function (k, i) {
+      return '<label for="r-' + i + '">' + esc(k) + '</label>' +
+             '<span><input id="r-' + i + '" data-rate="' + esc(k) + '" type="number" min="0" step="100" value="' +
+             esc(rates[k] || W.RATE[k]) + '"> <span class="cfg__unit">DH/m²</span></span>';
+    }).join('');
+  }
+
+  function wireSave(btnId, msgId, collect, key) {
+    var btn = document.getElementById(btnId), msg = document.getElementById(msgId);
+    btn.addEventListener('click', function () {
+      btn.disabled = true;
+      msg.className = 'cfg__msg';
+      msg.textContent = 'Enregistrement…';
+      W.saveSetting(key, collect()).then(function () {
+        msg.className = 'cfg__msg ok';
+        msg.textContent = 'Enregistré — visible par tout le monde.';
+        render();
+      }).catch(function (e) {
+        msg.className = 'cfg__msg ko';
+        msg.textContent = 'Échec : ' + (e.message || e) + '. Rien n’a été modifié.';
+      }).then(function () {
+        btn.disabled = false;
+        setTimeout(function () { if (msg.className === 'cfg__msg ok') msg.textContent = ''; }, 4000);
+      });
+    });
+  }
+
+  wireSave('saveGoals', 'msgGoals', function () {
+    var out = {};
+    GOAL_FIELDS.forEach(function (f) { out[f[0]] = Number(document.getElementById('g-' + f[0]).value); });
+    return out;
+  }, 'goals');
+
+  wireSave('saveRates', 'msgRates', function () {
+    var out = {};
+    document.querySelectorAll('[data-rate]').forEach(function (i) { out[i.dataset.rate] = Number(i.value); });
+    return out;
+  }, 'rates');
+
+  /* Statut d'un devis : information que seul le client détient. */
+  var STATUSES = ['nouveau', 'visite planifiée', 'devis envoyé', 'gagné', 'perdu'];
+  function onStatusChange(e) {
+    var sel = e.target;
+    if (!sel.classList.contains('status')) return;
+    var map = Object.assign({}, (W.CONFIG && W.CONFIG.quoteStatus) || {});
+    map[sel.dataset.id] = sel.value;
+    sel.disabled = true;
+    W.saveSetting('quoteStatus', map)
+      .then(function () { render(); })
+      .catch(function () { sel.disabled = false; alert('Statut non enregistré. Réessayez.'); });
+  }
+  document.addEventListener('change', onStatusChange);
+
   /* ------------------------------------------------------------- tableaux */
   var PILL = { 'nouveau': 'new', 'visite planifiée': 'plan', 'devis envoyé': 'sent',
                'gagné': 'won', 'perdu': 'lost' };
@@ -1119,8 +1259,20 @@ footer{max-width:1620px;margin:0 auto;padding:1.3rem var(--pad) 2.5rem;font-size
                '</td><td class="num">' + (r.mdh ? fmt1(r.mdh) + ' MDH' : '—') +
                '</td><td>' + esc(r.delai) + '</td><td>' + esc(L[r.src] || r.src) +
                '</td><td>' + String(r.lang || '').toUpperCase() + '</td><td>' + esc(r.when) +
-               '</td><td><span class="pill pill--' + (PILL[r.status] || 'new') + '">' + esc(r.status) + '</span></td></tr>';
+               '</td><td>' + statusCell(r) + '</td></tr>';
       }).join('') + '</tbody></table>';
+  }
+
+  /* En démo, le statut est figé : il n'y a personne derrière pour le tenir.
+     Sur les vraies demandes, il devient modifiable. */
+  function statusCell(r) {
+    if (!r.id) {
+      return '<span class="pill pill--' + (PILL[r.status] || 'new') + '">' + esc(r.status) + '</span>';
+    }
+    return '<select class="status" data-id="' + esc(r.id) + '" aria-label="Statut de la demande">' +
+      STATUSES.map(function (st) {
+        return '<option' + (st === r.status ? ' selected' : '') + '>' + st + '</option>';
+      }).join('') + '</select>';
   }
 
   function events() {
@@ -1203,7 +1355,7 @@ footer{max-width:1620px;margin:0 auto;padding:1.3rem var(--pad) 2.5rem;font-size
       }
     }
 
-    renderKPIs(); renderGoals(); renderMini(); renderNotes();
+    renderKPIs(); renderGoals(); renderMini(); renderNotes(); renderConfig();
     trend(); funnel(); sources(); types(); pipeline(); hours(); cities();
     surfaces(); budgets(); delays(); sections(); scroll(); langDev();
     projects(); faq(); filters(); weekday(); recent(); events();
@@ -1279,7 +1431,9 @@ footer{max-width:1620px;margin:0 auto;padding:1.3rem var(--pad) 2.5rem;font-size
     rsT = setTimeout(function () { sources(); langDev(); }, 160);
   });
 
-  render();
+  /* Les réglages conditionnent le pipeline et les objectifs : on les charge
+     avant de dessiner quoi que ce soit, sinon le premier rendu ment. */
+  W.loadSettings().then(render, render);
 })();
 </script>
 </body>

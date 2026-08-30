@@ -5,20 +5,22 @@
    noindex ne font que rendre la page discrète. Ici, rien ne sort du serveur
    sans le mot de passe.
 
-   Couvre trois chemins, et il faut les trois :
+   Couvre quatre chemins, et il les faut tous :
      /dashboard      la page
      /api/events     les chiffres  — sans ça, la page est fermée mais pas les données
      /api/settings   les réglages
+     /api/pagespeed  la mesure de vitesse (et la clé qui va avec)
    /api/collect reste ouvert : c'est par là que les visiteurs envoient les
    événements, il doit répondre à tout le monde.
 
    Réglage dans Vercel (Settings -> Environment Variables) :
      DASH_PASSWORD   le mot de passe          (obligatoire)
      DASH_USER       l'identifiant, défaut « wolcons » (facultatif)
+     PAGESPEED_KEY   clé Google PageSpeed (facultatif, pour la carte vitesse)
    ========================================================================== */
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/api/events', '/api/settings']
+  matcher: ['/dashboard/:path*', '/api/events', '/api/settings', '/api/pagespeed']
 };
 
 export default function middleware(request) {

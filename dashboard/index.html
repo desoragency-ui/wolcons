@@ -165,6 +165,15 @@ main{max-width:1620px;margin:0 auto;padding:var(--pad)}
 .cfg__msg{font-size:.78rem;color:var(--muted)}
 .cfg__msg.ok{color:var(--good)} .cfg__msg.ko{color:var(--bad)}
 .cfg__note{font-size:.74rem;color:var(--muted);line-height:1.45}
+/* ---------- vitesse ---------- */
+.psi__score{display:flex;align-items:baseline;gap:.5rem;margin-bottom:.6rem}
+.psi__score b{font-family:var(--head);font-size:2.1rem;font-weight:700;line-height:1;color:var(--k,var(--ink))}
+.psi__score span{font-size:.76rem;color:var(--muted)}
+.psi__vitals{display:grid;grid-template-columns:1fr auto;gap:.3rem .6rem;font-size:.8rem}
+.psi__vitals dt{color:var(--body)}
+.psi__vitals dd{margin:0;font-variant-numeric:tabular-nums;font-weight:600;color:var(--k,var(--ink))}
+.psi__when{font-size:.72rem;color:var(--muted);margin-top:.6rem}
+
 input.price{
   width:78px;padding:.2em .4em;text-align:right;font:inherit;font-size:.8rem;
   font-variant-numeric:tabular-nums;color:var(--ink);background:var(--bg-2);
@@ -340,7 +349,7 @@ footer{max-width:1620px;margin:0 auto;padding:1.3rem var(--pad) 2.5rem;font-size
     </div>
 
     <!-- Ce que le collecteur ne peut pas deviner : c'est Wolcons qui le sait. -->
-    <div class="card span-6">
+    <div class="card span-5">
       <div class="card__hd">
         <div>
           <h3>Vos objectifs mensuels</h3>
@@ -356,7 +365,7 @@ footer{max-width:1620px;margin:0 auto;padding:1.3rem var(--pad) 2.5rem;font-size
       </div>
     </div>
 
-    <div class="card span-6">
+    <div class="card span-4">
       <div class="card__hd">
         <div>
           <h3>Vos prix indicatifs au m²</h3>
@@ -378,6 +387,12 @@ footer{max-width:1620px;margin:0 auto;padding:1.3rem var(--pad) 2.5rem;font-size
     </div>
 
     <!-- ligne 3 : acquisition -->
+    <div class="card span-3">
+      <h3>Vitesse du site</h3>
+      <p class="card__sub">Mesurée par Google, sur mobile</p>
+      <div id="psi"><p class="cfg__note">Mesure en cours…</p></div>
+    </div>
+
     <div class="card span-4">
       <h3>Sources de trafic</h3>
       <p class="card__sub">D’où viennent les visiteurs</p>
@@ -1474,9 +1489,46 @@ footer{max-width:1620px;margin:0 auto;padding:1.3rem var(--pad) 2.5rem;font-size
     rsT = setTimeout(function () { sources(); langDev(); }, 160);
   });
 
+  /* ---------------------------------------------------- vitesse du site
+     Chargée à part, APRÈS le tableau de bord : Google met 15 à 30 secondes
+     à répondre la première fois, hors de question de retarder le reste. */
+  function paintSpeed(d) {
+    var el = document.getElementById('psi');
+    if (!el) return;
+    if (d.unavailable) {
+      el.innerHTML = '<p class="cfg__note">' + esc(d.message || 'Mesure indisponible.') + '</p>';
+      return;
+    }
+    /* seuils de Google : >=90 bon, 50-89 à surveiller, <50 mauvais.
+       C'est un état, pas une identité : il porte donc les couleurs d'état. */
+    var col = d.score >= 90 ? CSS('--good') : d.score >= 50 ? CSS('--warn') : CSS('--bad');
+    var ms = function (v) { return v == null ? '—' : (v / 1000).toFixed(1).replace('.', ',') + ' s'; };
+    el.innerHTML =
+      '<div class="psi__score" style="--k:' + col + '"><b>' + d.score + '</b>' +
+      '<span>/ 100 &nbsp;·&nbsp; ' +
+      (d.score >= 90 ? 'rapide' : d.score >= 50 ? 'à surveiller' : 'trop lent') + '</span></div>' +
+      '<dl class="psi__vitals" style="--k:' + col + '">' +
+        '<dt>Affichage du contenu principal</dt><dd>' + ms(d.lcp) + '</dd>' +
+        '<dt>Stabilité visuelle</dt><dd>' + (d.cls == null ? '—' : String(d.cls).replace('.', ',')) + '</dd>' +
+        '<dt>Blocage avant interaction</dt><dd>' + (d.tbt == null ? '—' : Math.round(d.tbt) + ' ms') + '</dd>' +
+      '</dl>' +
+      '<p class="psi__when">Mesuré le ' + new Date(d.measuredAt).toLocaleDateString('fr-FR') +
+      (d.stale ? ' — Google n’a pas répondu depuis.' : '') + '</p>';
+  }
+
+  function loadSpeed() {
+    fetch('/api/pagespeed', { credentials: 'include' })
+      .then(function (r) { return r.json(); })
+      .then(paintSpeed)
+      .catch(function () {
+        var el = document.getElementById('psi');
+        if (el) el.innerHTML = '<p class="cfg__note">Mesure indisponible pour le moment.</p>';
+      });
+  }
+
   /* Les réglages conditionnent le pipeline et les objectifs : on les charge
      avant de dessiner quoi que ce soit, sinon le premier rendu ment. */
-  W.loadSettings().then(render, render);
+  W.loadSettings().then(render, render).then(loadSpeed, loadSpeed);
 })();
 </script>
 </body>

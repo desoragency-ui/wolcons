@@ -264,5 +264,38 @@ Remplacer une image = déposer un fichier de même nom dans le même dossier.
 
 ## Déploiement
 
-100 % statique → Netlify, Vercel, GitHub Pages, ou n'importe quel hébergement
-mutualisé. Glisser-déposer le dossier `wolcons/` suffit.
+100 % statique → Netlify, Vercel, Cloudflare Pages, GitHub Pages, ou n'importe
+quel hébergement mutualisé. Glisser-déposer le dossier `wolcons/` suffit :
+aucune étape de build, aucune dépendance à installer.
+
+### Le tableau de bord doit être protégé côté hébergeur
+
+`/dashboard/` n'est pas public par nature, mais **rien dans ce dépôt ne le
+protège**. Ce qui existe aujourd'hui ne fait que le rendre discret :
+
+| Mesure | Ce qu'elle fait | Ce qu'elle ne fait pas |
+|---|---|---|
+| `<meta robots="noindex">` | demande aux moteurs de ne pas indexer | n'empêche pas l'accès |
+| `Disallow: /dashboard/` dans `robots.txt` | demande aux robots de ne pas explorer | n'empêche pas l'accès |
+| Lien de pied de page masqué (`?tdb=1`) | retire le lien de la vue des visiteurs | le code est public, l'URL reste tapable |
+
+Un visiteur qui tape l'adresse arrive sur le tableau de bord. La seule vraie
+protection est une authentification chez l'hébergeur :
+
+- **Cloudflare Access** (gratuit jusqu'à 50 utilisateurs) — Zero Trust → Access
+  → Applications → Self-hosted, chemin `dashboard`, règle *Allow* sur les
+  adresses e-mail autorisées. Le visiteur reçoit un code par e-mail.
+- **Netlify** — protection par mot de passe (offre payante).
+
+À noter : `Disallow` empêchant l'exploration, un robot qui le respecte ne lira
+jamais le `noindex` de la page. Les deux mesures se doublent sans se renforcer ;
+c'est sans conséquence ici, mais ça explique pourquoi elles ne remplacent pas
+l'authentification.
+
+### Données réelles
+
+Tant que `ENDPOINT` est vide dans `assets/js/analytics.js`, les événements
+restent dans le navigateur de chaque visiteur : le mode « Données réelles »
+n'affiche donc que votre propre navigation, sur votre propre appareil. Pour des
+chiffres multi-appareils, il faut un point de collecte (fonction serverless +
+table) et renseigner `ENDPOINT`.

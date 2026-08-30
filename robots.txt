@@ -1,0 +1,14 @@
+# Wolcons -- github.com/desoragency-ui/wolcons
+# Site vitrine d'une seule page : tout est ouvert a l'indexation,
+# sauf le tableau de bord interne.
+#
+# Volontairement sans accents : un .txt ne declare pas son encodage, et
+# tous les hebergeurs n'envoient pas charset=utf-8 sur text/plain.
+# Voir le README pour le detail (section Deploiement).
+
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+
+# Sitemap : a completer une fois le domaine definitif en place.
+# Sitemap: https://www.wolcons.com/sitemap.xml

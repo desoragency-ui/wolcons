@@ -59,7 +59,7 @@
   };
 
   /* Réglages enregistrés côté serveur, donc valables sur tous les appareils. */
-  var CONFIG = { goals: null, rates: null, quoteStatus: {} };
+  var CONFIG = { goals: null, rates: null, quoteStatus: {}, quotePrice: {} };
 
   function loadSettings() {
     return fetch(SETTINGS, { credentials: 'include' })
@@ -69,6 +69,7 @@
         if (j.rates) { CONFIG.rates = j.rates; Object.keys(j.rates).forEach(function (k) { RATE[k] = j.rates[k]; }); }
         if (j.goals) CONFIG.goals = j.goals;
         CONFIG.quoteStatus = j.quoteStatus || {};
+        CONFIG.quotePrice = j.quotePrice || {};
         return CONFIG;
       })
       .catch(function () { return CONFIG; });
@@ -488,20 +489,23 @@
             if (det.typeIdx >= 0 && TYPES[det.typeIdx]) det.type = TYPES[det.typeIdx];
             if (det.delaiIdx >= 0 && DELAYS[det.delaiIdx]) det.delai = DELAYS[det.delaiIdx];
             var m2 = parseSurface(det.surface);
-            var mdh = valueMDH(det.type, m2);
+            /* Le prix saisi par le client remplace l'estimation partout — KPI,
+               pipeline, tranches de budget — sinon la moitié du tableau de bord
+               parlerait d'estimations et l'autre de chiffres réels. */
+            var real = e.id ? Number(CONFIG.quotePrice[e.id]) : NaN;
+            var isReal = Number.isFinite(real) && real > 0;
+            var mdh = isReal ? real : valueMDH(det.type, m2);
             row.value += mdh;
             out.types[det.type || 'Non précisé'] = (out.types[det.type || 'Non précisé'] || 0) + 1;
             out.cities[det.ville || 'Non précisée'] = (out.cities[det.ville || 'Non précisée'] || 0) + 1;
             out.delays[det.delai || 'Non précisé'] = (out.delays[det.delai || 'Non précisé'] || 0) + 1;
             out.pipelineByType[det.type || 'Non précisé'] = (out.pipelineByType[det.type || 'Non précisé'] || 0) + mdh;
-            if (m2) {
-              out.surfaces[bandOfSurface(m2)] = (out.surfaces[bandOfSurface(m2)] || 0) + 1;
-              out.budgets[bandOfBudget(mdh)] = (out.budgets[bandOfBudget(mdh)] || 0) + 1;
-            }
+            if (m2) out.surfaces[bandOfSurface(m2)] = (out.surfaces[bandOfSurface(m2)] || 0) + 1;
+            if (m2 || isReal) out.budgets[bandOfBudget(mdh)] = (out.budgets[bandOfBudget(mdh)] || 0) + 1;
             quoteRows.push({
               id: e.id || null,
               who: det.who || '—', type: det.type || 'Non précisé', ville: det.ville || 'Non précisée',
-              surface: m2, band: m2 ? bandOfSurface(m2) : '—', mdh: mdh,
+              surface: m2, band: m2 ? bandOfSurface(m2) : '—', mdh: mdh, priceIsReal: isReal,
               delai: det.delai || 'Non précisé', src: e.src, lang: e.lang,
               when: k,
               /* le statut vient du client : lui seul sait si un devis est gagné */

@@ -3,14 +3,14 @@
    client renseigne lui-même. Stocké en base, donc valable sur tous les
    appareils, pas seulement celui qui a saisi.
 
-   GET            -> { goals, rates, quoteStatus }
-   POST { key, value } -> enregistre une clé (goals | rates | quoteStatus)
+   GET            -> { goals, rates, quoteStatus, quotePrice }
+   POST { key, value } -> enregistre une clé (goals | rates | quoteStatus | quotePrice)
 
    PROTÉGÉE par middleware.js, comme /dashboard/ et /api/events.
    ========================================================================== */
 import { sql, ensure, json } from './_db.js';
 
-const KEYS = new Set(['goals', 'rates', 'quoteStatus']);
+const KEYS = new Set(['goals', 'rates', 'quoteStatus', 'quotePrice']);
 
 /* Valeurs de départ.
 
@@ -31,7 +31,8 @@ const DEFAULTS = {
     'Rénovation / réhabilitation': 10900,
     'Je ne sais pas encore': 8000
   },
-  quoteStatus: {}
+  quoteStatus: {},
+  quotePrice: {}
 };
 
 const NUM_KEYS = { goals: ['views', 'quotes', 'contacts', 'value'] };
@@ -55,6 +56,21 @@ function sanitize(key, value) {
     }
     return out;
   }
+  /* Prix réel d'un devis, en MDH, saisi par le client. Remplace l'estimation
+     surface x prix au m² : une valeur connue vaut mieux qu'un ordre de grandeur. */
+  if (key === 'quotePrice') {
+    const out = {};
+    let n = 0;
+    for (const [id, v] of Object.entries(value || {})) {
+      if (n++ > 5000) break;
+      if (!/^\d{1,20}$/.test(id)) continue;
+      const num = Number(v);
+      /* 0 ou vide = le client retire le prix et revient à l'estimation */
+      if (Number.isFinite(num) && num > 0 && num < 100000) out[id] = num;
+    }
+    return out;
+  }
+
   if (key === 'quoteStatus') {
     const allowed = new Set(['nouveau', 'visite planifiée', 'devis envoyé', 'gagné', 'perdu']);
     const out = {};

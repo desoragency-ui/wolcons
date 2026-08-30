@@ -165,6 +165,16 @@ main{max-width:1620px;margin:0 auto;padding:var(--pad)}
 .cfg__msg{font-size:.78rem;color:var(--muted)}
 .cfg__msg.ok{color:var(--good)} .cfg__msg.ko{color:var(--bad)}
 .cfg__note{font-size:.74rem;color:var(--muted);line-height:1.45}
+input.price{
+  width:78px;padding:.2em .4em;text-align:right;font:inherit;font-size:.8rem;
+  font-variant-numeric:tabular-nums;color:var(--ink);background:var(--bg-2);
+  border:1px solid var(--line);border-radius:var(--r-sm);
+}
+input.price:focus-visible{border-color:var(--orange)}
+input.price.is-real{border-color:var(--good);color:var(--good);font-weight:600}
+.price-tag{font-size:.68rem;color:var(--muted);margin-inline-start:.35em}
+.price-tag.is-real{color:var(--good)}
+
 select.status{
   font:inherit;font-size:.78rem;color:var(--ink);background:var(--bg-2);
   border:1px solid var(--line);border-radius:100px;padding:.2em 1.4em .2em .6em;cursor:pointer;
@@ -1234,6 +1244,20 @@ footer{max-width:1620px;margin:0 auto;padding:1.3rem var(--pad) 2.5rem;font-size
   }
   document.addEventListener('change', onStatusChange);
 
+  /* Prix réel : vider le champ efface la valeur et fait revenir l'estimation. */
+  document.addEventListener('change', function (e) {
+    var inp = e.target;
+    if (!inp.classList || !inp.classList.contains('price')) return;
+    var map = Object.assign({}, (W.CONFIG && W.CONFIG.quotePrice) || {});
+    var v = parseFloat(String(inp.value).replace(',', '.'));
+    if (Number.isFinite(v) && v > 0) map[inp.dataset.price] = v;
+    else delete map[inp.dataset.price];
+    inp.disabled = true;
+    W.saveSetting('quotePrice', map)
+      .then(function () { render(); })
+      .catch(function () { inp.disabled = false; alert('Prix non enregistré. Réessayez.'); });
+  });
+
   /* ------------------------------------------------------------- tableaux */
   var PILL = { 'nouveau': 'new', 'visite planifiée': 'plan', 'devis envoyé': 'sent',
                'gagné': 'won', 'perdu': 'lost' };
@@ -1251,16 +1275,35 @@ footer{max-width:1620px;margin:0 auto;padding:1.3rem var(--pad) 2.5rem;font-size
     }
     el.innerHTML =
       '<table><thead><tr><th>Contact</th><th>Type de projet</th><th>Ville</th>' +
-      '<th class="num">Surface</th><th class="num">Budget estimé</th><th>Démarrage</th>' +
+      '<th class="num">Surface</th><th class="num">Budget (MDH)</th><th>Démarrage</th>' +
       '<th>Source</th><th>Langue</th><th>Date</th><th>Statut</th></tr></thead><tbody>' +
       rows.map(function (r) {
         return '<tr><td>' + esc(r.who) + '</td><td>' + esc(r.type) + '</td><td>' + esc(r.ville) +
                '</td><td class="num">' + (r.surface ? fmt(r.surface) + ' m²' : '—') +
-               '</td><td class="num">' + (r.mdh ? fmt1(r.mdh) + ' MDH' : '—') +
+               '</td><td class="num">' + priceCell(r) +
                '</td><td>' + esc(r.delai) + '</td><td>' + esc(L[r.src] || r.src) +
                '</td><td>' + String(r.lang || '').toUpperCase() + '</td><td>' + esc(r.when) +
                '</td><td>' + statusCell(r) + '</td></tr>';
       }).join('') + '</tbody></table>';
+  }
+
+  /* Budget : l'estimation surface x prix au m² tant que le client n'a rien saisi,
+     son chiffre réel dès qu'il en a un. La couleur dit lequel des deux on lit —
+     sans ça, impossible de savoir si le pipeline repose sur du solide. */
+  function priceCell(r) {
+    if (!r.id) {
+      return (r.mdh ? fmt1(r.mdh) + ' MDH' : '—') +
+             '<span class="price-tag">est.</span>';
+    }
+    /* un <input type="number"> n'accepte que le point décimal : fmt1() rend
+       « 7,5 » à la française, que le navigateur refuse et efface en silence */
+    var val = r.priceIsReal ? String(Math.round(r.mdh * 100) / 100) : '';
+    return '<input class="price' + (r.priceIsReal ? ' is-real' : '') + '" type="number" ' +
+           'min="0" step="0.1" inputmode="decimal" data-price="' + esc(r.id) + '" ' +
+           'value="' + val + '" placeholder="' + (r.mdh ? fmt1(r.mdh) : '—') + '" ' +
+           'aria-label="Prix réel en MDH" title="Prix réel du projet, en MDH. Vide = estimation.">' +
+           '<span class="price-tag' + (r.priceIsReal ? ' is-real' : '') + '">' +
+           (r.priceIsReal ? 'réel' : 'est.') + '</span>';
   }
 
   /* En démo, le statut est figé : il n'y a personne derrière pour le tenir.

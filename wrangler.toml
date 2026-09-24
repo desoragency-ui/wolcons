@@ -12,6 +12,7 @@ compatibility_flags = ["nodejs_compat"]
 #   DATABASE_URL          chaîne de connexion Neon   (obligatoire)
 #   ACCESS_TEAM_DOMAIN    domaine d'équipe Cloudflare Access
 #   ACCESS_AUD            « Application Audience (AUD) Tag » de l'application
+#   ALLOWED_EMAILS        adresses autorisées, séparées par des virgules
 #   DASH_PASSWORD         repli mot de passe, si Access n'est pas utilisé
 #   DASH_USER             identifiant du repli, défaut « wolcons »
 #   PAGESPEED_KEY         clé Google PageSpeed (facultatif)

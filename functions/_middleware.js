@@ -9,7 +9,7 @@
      /api/events     les chiffres  — sans ça, la page est fermée mais pas les données
      /api/settings   les réglages
      /api/pagespeed  la mesure de vitesse (et la clé qui va avec)
-   /api/collect reste ouvert : c'est par là que les visiteurs envoient les
+   /api/wlc reste ouvert : c'est par là que les visiteurs envoient les
    événements, il doit répondre à tout le monde.
 
    DEUX MODES, au choix, réglés par variables d'environnement :
@@ -43,11 +43,27 @@ const PROTECTED = [
   (p) => p === '/api/pagespeed'
 ];
 
+/* Le tableau de bord n'a qu'une adresse : celle que couvre l'application
+   Cloudflare Access. Depuis wolcons.com (ou toute autre adresse du site), on y
+   renvoie au lieu de répondre « accès refusé ». Les aperçus *.wolcons.pages.dev
+   et le poste de développement restent servis sur place. */
+const DASH_HOST = 'wolcons.pages.dev';
+
+function onDashHost(host) {
+  return host === DASH_HOST || host.endsWith('.' + DASH_HOST)
+    || host === 'localhost' || host === '127.0.0.1';
+}
+
 export async function onRequest(context) {
   const { request, env, next } = context;
-  const path = new URL(request.url).pathname;
+  const url = new URL(request.url);
+  const path = url.pathname;
 
   if (!PROTECTED.some((match) => match(path))) return next();
+
+  if (!onDashHost(url.hostname)) {
+    return Response.redirect('https://' + DASH_HOST + path + url.search, 302);
+  }
 
   const teamDomain = env.ACCESS_TEAM_DOMAIN;
   const aud = env.ACCESS_AUD;

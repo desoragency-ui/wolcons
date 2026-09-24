@@ -290,7 +290,7 @@ qu'elle est gratuite **et** autorisée en usage commercial :
 index.html · styles.css · script.js · i18n.js · assets/ · dashboard/   le site
 functions/            code exécuté par Cloudflare
   _middleware.js        authentification de /dashboard et des /api protégées
-  api/collect.js        POST public — réception des événements
+  api/wlc.js            POST public — réception des événements (api/collect.js = ancien nom)
   api/events.js         GET protégé — lecture pour le tableau de bord
   api/settings.js       GET/POST protégé — objectifs, prix au m², suivi des devis
   api/pagespeed.js      GET protégé — mesure Google, en cache 12 h
@@ -305,75 +305,83 @@ internes), `package.json`, `tools/` et `node_modules/`. Il écrit aussi
 `dist/_routes.json`, qui limite l'exécution des fonctions à `/dashboard/*` et
 `/api/*` : tout le reste est servi en statique pur, gratuit et illimité.
 
-### Mise en ligne — une fois, ~20 minutes
+### Ce qui est en place (septembre 2026)
 
-**1. Base Neon** — [neon.com](https://neon.com) → *Sign up* (gratuit, sans
-carte) → *Create project*, région **Europe (Frankfurt)**, la plus proche du
-Maroc. Copier la chaîne **Connection string** (`postgresql://…`).
-Aucune table à créer : elles se créent toutes seules au premier événement reçu.
-
-**2. Projet Cloudflare Pages** — [dash.cloudflare.com](https://dash.cloudflare.com)
-→ *Workers & Pages* → *Create* → *Pages* → *Connect to Git* → dépôt
-`desoragency-ui/wolcons`.
-
-| Réglage | Valeur |
+| Élément | Valeur |
 |---|---|
-| Build command | `npm run build` |
-| Build output directory | `dist` |
-| Root directory | (laisser vide) |
+| Projet Pages | `wolcons` — https://wolcons.pages.dev (compte desoragency@gmail.com) |
+| Base Neon | projet `wolcons` (`fancy-frog-51033111`), région Frankfurt |
+| Équipe Access | `lingering-violet-82b4` |
+| Application Access | « Tableau de bord Wolcons » : `wolcons.pages.dev/dashboard`, `/api/events`, `/api/settings`, `/api/pagespeed` |
+| Règle Access | « Proprietaires Wolcons » : desoragency@gmail.com, tarem.nadir@gmail.com, code reçu par e-mail (One-time PIN), session 24 h |
+| Variables Pages | `DATABASE_URL`, `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD`, `ALLOWED_EMAILS` (secrets) |
 
-**3. Variables** — *Settings → Variables and Secrets*, en **Production** :
+Le tableau de bord n'a **qu'une adresse** : https://wolcons.pages.dev/dashboard/.
+Sur wolcons.com, `/dashboard` renvoie vers elle (`functions/_middleware.js`),
+ce qui évite de dupliquer l'application Access pour chaque domaine.
 
-| Nom | Valeur | Type |
-|---|---|---|
-| `DATABASE_URL` | la chaîne Neon de l'étape 1 | Secret |
-| `PAGESPEED_KEY` | clé Google PageSpeed *(facultatif)* | Secret |
+### Publier une modification
 
-Redéployer après avoir ajouté les variables : un déploiement ne les relit pas
-tout seul.
+Le projet Pages n'est **pas** relié à GitHub : pousser sur `main` ne met rien en
+ligne. On publie depuis ce dossier :
 
-**4. Domaine** — *Custom domains* → ajouter `wolcons.com`. Cloudflare demande
-de déléguer les serveurs de noms du domaine (gratuit) ; c'est aussi ce qui rend
-l'étape 5 possible.
+```bash
+npm run build
+npx wrangler pages deploy dist --project-name wolcons --branch main
+```
 
-**5. Protéger le tableau de bord** — *Zero Trust → Access → Applications →
-Add an application → Self-hosted* :
+(`npx wrangler login` une fois par poste, avec le compte Cloudflare ci-dessus.)
 
-- Domaine `wolcons.com`, chemin `dashboard`
-- Ajouter une seconde application identique sur le domaine `wolcons.pages.dev`,
-  sinon l'adresse `*.pages.dev` reste un contournement
-- *Policy* : **Allow**, sélecteur **Emails**, avec les adresses autorisées
-- Méthode de connexion : **One-time PIN** (code reçu par e-mail, aucun compte à créer)
+### Ajouter ou retirer une personne
 
-Puis relever l'**Application Audience (AUD) Tag** de l'application et le
-domaine d'équipe, et les remettre dans Pages en variables :
+Deux endroits, **les deux** sinon l'accès est refusé :
 
-| Nom | Valeur |
-|---|---|
-| `ACCESS_TEAM_DOMAIN` | `wolcons` (ou `wolcons.cloudflareaccess.com`) |
-| `ACCESS_AUD` | le *AUD Tag* de l'application |
+1. *Zero Trust → Access controls → Policies → Proprietaires Wolcons* : l'adresse
+   dans **Emails**.
+2. *Workers & Pages → wolcons → Settings → Variables and Secrets* :
+   `ALLOWED_EMAILS` (adresses séparées par des virgules), puis republier.
 
-Ces deux variables ne sont pas décoratives : `functions/_middleware.js`
-**vérifie la signature** du jeton émis par Access (émetteur, audience,
-expiration, clé publique de l'équipe). Sans cette vérification, il suffirait
-d'atteindre l'application par une autre adresse pour passer à côté d'Access.
+Le second mur existe exprès : si la règle Access était un jour élargie par
+erreur, `_middleware.js` refuse encore toute adresse absente de la liste. Il
+**vérifie aussi la signature** du jeton Access (émetteur, audience, expiration),
+sans quoi l'URL `*.pages.dev` suffirait à contourner Access.
+
+### Le bouton « Tableau de bord » sur le site
+
+Il n'apparaît que dans un navigateur marqué « propriétaire » (`wlc_owner` dans
+le stockage du navigateur). Ce navigateur ne compte plus dans les chiffres.
+
+- Ouvrir le tableau de bord marque le navigateur pour **wolcons.pages.dev**.
+- Pour **wolcons.com** : bouton maison en haut du tableau de bord, ou
+  `https://wolcons.com/?tdb=1`.
+- `?tdb=0` retire le marquage.
+
+Ce n'est pas la sécurité (n'importe qui peut ajouter `?tdb=1`) : le bouton mène
+à Access, qui refuse tout le monde sauf les deux adresses.
+
+### Domaine wolcons.com
+
+Enregistré chez Namecheap. Les e-mails passent par Google (5 enregistrements MX)
+et doivent le rester : toute zone DNS doit reprendre ces MX et le TXT
+`google-site-verification`. Pour que wolcons.com serve ce site, la zone est
+ajoutée à Cloudflare et le domaine est rattaché au projet Pages
+(`wolcons.com`, `www.wolcons.com`). Les serveurs de noms Namecheap doivent
+pointer vers ceux que Cloudflare attribue. Tant que ce n'est pas fait,
+wolcons.com sert encore l'ancienne copie hébergée ailleurs et **ses visites
+n'arrivent pas au tableau de bord**.
 
 ### Repli : mot de passe unique
 
-Si le domaine ne peut pas être délégué à Cloudflare, Access est indisponible.
-Dans ce cas, renseigner à la place :
+Si Access devait être abandonné, retirer `ACCESS_TEAM_DOMAIN` / `ACCESS_AUD` et
+renseigner `DASH_PASSWORD` (et `DASH_USER`, défaut `wolcons`) : le navigateur
+affiche sa propre fenêtre de connexion. Moins bien : un seul secret pour tout
+le monde. **Si aucune méthode n'est configurée, tout est refusé (503).**
 
-| Nom | Valeur |
-|---|---|
-| `DASH_PASSWORD` | le mot de passe | 
-| `DASH_USER` | l'identifiant, défaut `wolcons` |
+### Pourquoi `/api/wlc` et pas `/api/collect`
 
-Le navigateur affiche alors sa propre fenêtre de connexion. Moins bien
-qu'Access — un seul secret pour tout le monde, non révocable individuellement —
-mais fonctionnel.
-
-**Si aucune des deux méthodes n'est configurée, tout est refusé (503).** Un
-tableau de bord injoignable vaut mieux qu'un tableau de bord ouvert.
+La liste EasyPrivacy (uBlock Origin, Brave, AdGuard) bloque `/api/collect` :
+ces visiteurs disparaissaient des chiffres. `api/collect.js` reste en alias pour
+les navigateurs qui ont gardé l'ancien script en cache.
 
 ### En local
 
@@ -399,7 +407,7 @@ python -m http.server 8130
 
 ### Ce que voit le tableau de bord
 
-- **Données réelles** — tout ce que `/api/collect` a enregistré, tous appareils
+- **Données réelles** — tout ce que `/api/wlc` a enregistré, tous appareils
   et tous visiteurs confondus. C'est le mode normal une fois en ligne.
 - **Démo** — chiffres fictifs, étiquetés comme tels, pour juger de la maquette
   avant que la base ait accumulé quoi que ce soit.

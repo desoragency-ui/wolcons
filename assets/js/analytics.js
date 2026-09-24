@@ -14,8 +14,10 @@
 
   /* Adresse du collecteur, sur le même domaine que le site
      (Cloudflare Pages Function).
+     Pas « /api/collect » : la liste EasyPrivacy (uBlock, Brave, AdGuard) bloque
+     cette adresse, et ces visiteurs-là disparaissaient des chiffres.
      Vider cette chaîne remet le mode « rien ne quitte l'appareil ». */
-  var ENDPOINT = '/api/collect';
+  var ENDPOINT = '/api/wlc';
   var KEY = 'wlc_events';
   var CAP = 900;              // tampon circulaire, garde le localStorage petit
 
@@ -25,11 +27,21 @@
        et la mesure PageSpeed/Lighthouse que le tableau de bord déclenche lui-même.
      wlcTrack reste défini (vide) : le reste du site peut l'appeler sans risque. */
   var skip = false;
-  try { skip = localStorage.getItem('wlc_owner') === '1'; } catch (e) {}
+  try {
+    /* ?tdb=1 marque ce navigateur comme propriétaire (lien depuis le tableau de
+       bord), ?tdb=0 le démarque. Lu ici, avant la première page vue, pour que
+       la visite qui porte le marquage ne soit pas comptée non plus. */
+    var tdb = new URLSearchParams(location.search).get('tdb');
+    if (tdb === '1') localStorage.setItem('wlc_owner', '1');
+    if (tdb === '0') localStorage.removeItem('wlc_owner');
+    skip = localStorage.getItem('wlc_owner') === '1';
+  } catch (e) {}
   if (!skip) {
+    var ua = navigator.userAgent || '';
+    /* « cubot » : une marque de téléphones, pas un robot */
     skip = navigator.webdriver === true ||
-      /bot|crawl|spider|slurp|headless|lighthouse|pagespeed|gtmetrix|pingdom|uptime|prerender|phantom|puppeteer|playwright/i
-        .test(navigator.userAgent || '');
+      (/bot|crawl|spider|slurp|headless|lighthouse|pagespeed|gtmetrix|pingdom|uptime|prerender|phantom|puppeteer|playwright/i
+        .test(ua) && !/cubot/i.test(ua));
   }
   if (skip) {
     window.wlcTrack = function () { return null; };

@@ -857,13 +857,14 @@
      et les données à tout autre visiteur. Ce bloc ne fait qu'afficher un
      raccourci à ceux qui ont déjà passé la porte.
 
-     Retirer le bouton de cet appareil : ajouter ?tdb=0 à l'adresse.        */
+     Marquer / démarquer cet appareil : ?tdb=1 / ?tdb=0 dans l'adresse
+     (lu par analytics.js, chargé avant ce fichier).                        */
   var dashLinks = $$('[data-dash-link]');
   if (dashLinks.length) {
     try {
-      if (new URLSearchParams(location.search).get('tdb') === '0') {
-        localStorage.removeItem('wlc_owner');
-      }
+      var tdb = new URLSearchParams(location.search).get('tdb');
+      if (tdb === '1') localStorage.setItem('wlc_owner', '1');
+      if (tdb === '0') localStorage.removeItem('wlc_owner');
       if (localStorage.getItem('wlc_owner') === '1') {
         dashLinks.forEach(function (a) { a.hidden = false; });
       }

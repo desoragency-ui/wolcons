@@ -1717,13 +1717,19 @@
     <p>© <span data-year>2026</span> Wolcons® — La construction, la perfection à son meilleur.</p>
     <p>
       Tous droits réservés.
-      <!-- Raccourci vers le tableau de bord. Masqué par défaut, révélé par
-           ?tdb=1 sur l'appareil. CONFORT D'ACCÈS, PAS UNE SÉCURITÉ : la vraie
-           protection de /dashboard/ se fait chez l'hébergeur. -->
+      <!-- Raccourci vers le tableau de bord. Masqué par défaut, affiché
+           seulement pour les propriétaires (voir script.js). La sécurité,
+           c'est Cloudflare Access sur /dashboard/, pas ce lien. -->
       <a class="footer__dash" href="dashboard/" hidden data-dash-link>Tableau de bord</a>
     </p>
   </div>
 </footer>
+
+<!-- Bouton flottant réservé aux propriétaires — même règle que le lien ci-dessus -->
+<a class="owner-dash" href="dashboard/" hidden data-dash-link aria-label="Ouvrir le tableau de bord">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+  <span>Tableau de bord</span>
+</a>
 
 <a class="whatsapp" href="https://wa.me/212661978186?text=Bonjour%20Wolcons%2C%20je%20souhaite%20un%20devis%20pour%20mon%20projet." target="_blank" rel="noopener" aria-label="Écrire à Wolcons sur WhatsApp">
   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2C6.6 2 2.2 6.4 2.2 11.84c0 1.94.53 3.75 1.45 5.3L2 22l4.98-1.6a9.8 9.8 0 0 0 5.06 1.4c5.43 0 9.84-4.4 9.84-9.84S17.47 2 12.04 2zm5.72 13.92c-.24.68-1.4 1.3-1.93 1.34-.5.05-.96.23-3.23-.67-2.72-1.07-4.44-3.85-4.57-4.03-.13-.18-1.09-1.45-1.09-2.77 0-1.32.7-1.97.94-2.24.25-.27.54-.34.72-.34l.52.01c.17 0 .39-.06.61.47l.84 2.03c.07.14.12.3.02.48l-.3.45-.44.48c-.14.14-.29.3-.12.58.16.28.72 1.19 1.55 1.93 1.07.95 1.97 1.25 2.25 1.39.28.14.44.12.6-.07l.86-1c.2-.24.37-.18.61-.09l1.95.92c.24.12.4.18.46.28.07.1.07.6-.17 1.28z"/></svg>

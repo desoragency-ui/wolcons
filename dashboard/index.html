@@ -274,8 +274,8 @@ footer{max-width:1620px;margin:0 auto;padding:1.3rem var(--pad) 2.5rem;font-size
     <span class="mode mode--demo" id="modeBadge">Données de démonstration</span>
 
     <div class="seg" role="group" aria-label="Source des données">
-      <button id="srcDemo" aria-pressed="true">Démo</button>
-      <button id="srcLive" aria-pressed="false">Données réelles</button>
+      <button id="srcDemo" aria-pressed="false">Démo</button>
+      <button id="srcLive" aria-pressed="true">Données réelles</button>
     </div>
 
     <div class="seg" role="group" aria-label="Période">
@@ -572,7 +572,7 @@ footer{max-width:1620px;margin:0 auto;padding:1.3rem var(--pad) 2.5rem;font-size
   var GOALS_FALLBACK = { views: 2500, quotes: 18, contacts: 110, value: 45 };
   function goals() { return (W.CONFIG && W.CONFIG.goals) || GOALS_FALLBACK; }
 
-  var state = { src: 'demo', days: 30, decal: false };
+  var state = { src: 'live', days: 30, decal: false };
   var charts = {};
   var D = null;
   var W = window.WolconsData;
@@ -1529,6 +1529,23 @@ footer{max-width:1620px;margin:0 auto;padding:1.3rem var(--pad) 2.5rem;font-size
   /* Les réglages conditionnent le pipeline et les objectifs : on les charge
      avant de dessiner quoi que ce soit, sinon le premier rendu ment. */
   W.loadSettings().then(render, render).then(loadSpeed, loadSpeed);
+
+  /* Temps réel : les événements arrivent en base à l'instant où ils se
+     produisent. On relit toutes les 30 s tant que l'onglet est visible, et
+     tout de suite quand on y revient. Pas de relecture en mode démo. */
+  var REFRESH_MS = 30000;
+  setInterval(function () {
+    if (state.src === 'live' && document.visibilityState === 'visible') render();
+  }, REFRESH_MS);
+  document.addEventListener('visibilitychange', function () {
+    if (state.src === 'live' && document.visibilityState === 'visible') render();
+  });
+
+  /* Cette page n'est joignable qu'après Cloudflare Access : l'avoir ouverte
+     prouve que ce navigateur appartient à un propriétaire. On le marque, pour
+     que le site affiche le bouton « Tableau de bord » et cesse de compter ses
+     propres visites (sinon les chiffres mesurent le propriétaire, pas les clients). */
+  try { localStorage.setItem('wlc_owner', '1'); } catch (e) {}
 })();
 </script>
 </body>

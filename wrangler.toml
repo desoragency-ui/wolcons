@@ -1,0 +1,17 @@
+# Projet Cloudflare Pages.
+#   pages_build_output_dir : ce que `npm run build` produit (site statique seul)
+#   functions/             : les routes /api/* et le filtre d'authentification,
+#                            lues à la racine du dépôt, jamais servies telles quelles
+name = "wolcons"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-09-11"
+compatibility_flags = ["nodejs_compat"]
+
+# Les valeurs sensibles ne sont PAS ici : elles se règlent dans
+# Cloudflare Pages -> Settings -> Variables and Secrets (chiffrées).
+#   DATABASE_URL          chaîne de connexion Neon   (obligatoire)
+#   ACCESS_TEAM_DOMAIN    domaine d'équipe Cloudflare Access
+#   ACCESS_AUD            « Application Audience (AUD) Tag » de l'application
+#   DASH_PASSWORD         repli mot de passe, si Access n'est pas utilisé
+#   DASH_USER             identifiant du repli, défaut « wolcons »
+#   PAGESPEED_KEY         clé Google PageSpeed (facultatif)

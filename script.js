@@ -847,25 +847,27 @@
     });
   }
 
-  /* ------------------------------------ Raccourci vers le tableau de bord
+  /* ------------------------------------ Bouton « Tableau de bord »
 
-     ATTENTION — ceci n'est PAS une sécurité. Le site est statique : le lien
-     est masqué, mais /dashboard/ reste joignable en tapant l'adresse, et le
-     code de cette page est lisible par tout le monde. La vraie protection se
-     configure chez l'hébergeur (Cloudflare Access, mot de passe Netlify…).
-     Ce bloc ne fait qu'éviter d'exposer le lien aux visiteurs.
+     Visible seulement dans un navigateur de propriétaire. Ce navigateur est
+     marqué (wlc_owner) par /dashboard/ lui-même, page joignable uniquement
+     après Cloudflare Access — donc seulement par les adresses autorisées.
 
-     Afficher le lien sur cet appareil : ajouter ?tdb=1 à l'adresse du site.
-     Le retirer :                        ajouter ?tdb=0.                     */
-  var dashLink = $('[data-dash-link]');
-  if (dashLink) {
-    var KEY = 'wlc_dash_link';
+     Ce n'est pas la sécurité : la sécurité est Access, qui refuse /dashboard/
+     et les données à tout autre visiteur. Ce bloc ne fait qu'afficher un
+     raccourci à ceux qui ont déjà passé la porte.
+
+     Retirer le bouton de cet appareil : ajouter ?tdb=0 à l'adresse.        */
+  var dashLinks = $$('[data-dash-link]');
+  if (dashLinks.length) {
     try {
-      var flag = new URLSearchParams(location.search).get('tdb');
-      if (flag === '1') localStorage.setItem(KEY, '1');
-      if (flag === '0') localStorage.removeItem(KEY);
-      if (localStorage.getItem(KEY) === '1') dashLink.hidden = false;
-    } catch (e) { /* stockage indisponible : le lien reste masqué */ }
+      if (new URLSearchParams(location.search).get('tdb') === '0') {
+        localStorage.removeItem('wlc_owner');
+      }
+      if (localStorage.getItem('wlc_owner') === '1') {
+        dashLinks.forEach(function (a) { a.hidden = false; });
+      }
+    } catch (e) { /* stockage indisponible : le bouton reste masqué */ }
   }
 
   /* --------- Si l'utilisateur active « mouvement réduit » en cours de route */

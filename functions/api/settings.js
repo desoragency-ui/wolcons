@@ -6,9 +6,9 @@
    GET            -> { goals, rates, quoteStatus, quotePrice }
    POST { key, value } -> enregistre une clé (goals | rates | quoteStatus | quotePrice)
 
-   PROTÉGÉE par middleware.js, comme /dashboard/ et /api/events.
+   PROTÉGÉE par functions/_middleware.js, comme /dashboard/ et /api/events.
    ========================================================================== */
-import { sql, ensure, json } from './_db.js';
+import { db, ensure, json } from '../../lib/db.js';
 
 const KEYS = new Set(['goals', 'rates', 'quoteStatus', 'quotePrice']);
 
@@ -84,27 +84,28 @@ function sanitize(key, value) {
   return null;
 }
 
-export default async function handler(req, res) {
+export async function onRequest({ request, env }) {
   try {
-    await ensure();
+    const sql = db(env);
+    await ensure(sql);
 
-    if (req.method === 'GET') {
-      const { rows } = await sql`SELECT key, value FROM settings`;
+    if (request.method === 'GET') {
+      const rows = await sql`SELECT key, value FROM settings`;
       const out = { ...DEFAULTS };
       for (const r of rows) if (KEYS.has(r.key)) out[r.key] = r.value;
-      return json(res, 200, out);
+      return json(200, out);
     }
 
-    if (req.method === 'POST') {
-      let body = req.body;
-      if (typeof body === 'string') {
-        try { body = JSON.parse(body); } catch { return json(res, 400, { error: 'json invalide' }); }
-      }
+    if (request.method === 'POST') {
+      let body;
+      try { body = JSON.parse(await request.text()); }
+      catch { return json(400, { error: 'json invalide' }); }
+
       const key = body?.key;
-      if (!KEYS.has(key)) return json(res, 400, { error: 'clé inconnue' });
+      if (!KEYS.has(key)) return json(400, { error: 'clé inconnue' });
 
       const value = sanitize(key, body.value);
-      if (value === null) return json(res, 400, { error: 'valeur invalide' });
+      if (value === null) return json(400, { error: 'valeur invalide' });
 
       await sql`
         INSERT INTO settings (key, value, updated_at)
@@ -112,11 +113,11 @@ export default async function handler(req, res) {
         ON CONFLICT (key) DO UPDATE
           SET value = EXCLUDED.value, updated_at = EXCLUDED.updated_at`;
 
-      return json(res, 200, { ok: true, key, value });
+      return json(200, { ok: true, key, value });
     }
 
-    return json(res, 405, { error: 'utiliser GET ou POST' });
+    return json(405, { error: 'utiliser GET ou POST' });
   } catch (e) {
-    return json(res, 500, { error: 'réglages indisponibles', detail: String(e).slice(0, 200) });
+    return json(500, { error: 'réglages indisponibles', detail: String(e).slice(0, 200) });
   }
 }

@@ -12,11 +12,29 @@
 (function () {
   'use strict';
 
-  /* Adresse du collecteur, sur le même domaine que le site (fonction Vercel).
+  /* Adresse du collecteur, sur le même domaine que le site
+     (Cloudflare Pages Function).
      Vider cette chaîne remet le mode « rien ne quitte l'appareil ». */
   var ENDPOINT = '/api/collect';
   var KEY = 'wlc_events';
   var CAP = 900;              // tampon circulaire, garde le localStorage petit
+
+  /* Ce qui ne doit PAS compter, pour que les chiffres décrivent des clients :
+     - le navigateur d'un propriétaire (marqué par /dashboard/, voir script.js)
+     - les robots qui exécutent le JavaScript : navigateurs pilotés, moteurs,
+       et la mesure PageSpeed/Lighthouse que le tableau de bord déclenche lui-même.
+     wlcTrack reste défini (vide) : le reste du site peut l'appeler sans risque. */
+  var skip = false;
+  try { skip = localStorage.getItem('wlc_owner') === '1'; } catch (e) {}
+  if (!skip) {
+    skip = navigator.webdriver === true ||
+      /bot|crawl|spider|slurp|headless|lighthouse|pagespeed|gtmetrix|pingdom|uptime|prerender|phantom|puppeteer|playwright/i
+        .test(navigator.userAgent || '');
+  }
+  if (skip) {
+    window.wlcTrack = function () { return null; };
+    return;
+  }
 
   function load() {
     try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return []; }

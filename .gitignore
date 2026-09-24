@@ -14,3 +14,14 @@ desktop.ini
 
 # Cache Python
 __pycache__/
+
+# Build Cloudflare Pages
+dist/
+node_modules/
+.wrangler/
+
+# Ancienne version Vercel, conservée hors dépôt
+.attic/
+
+# Secrets du dev local wrangler
+.dev.vars

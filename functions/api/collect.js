@@ -8,7 +8,7 @@
    Aucune donnée nominative : analytics.js n'envoie que des initiales, jamais
    de nom, d'e-mail ni de téléphone, et aucune adresse IP n'est stockée.
    ========================================================================== */
-import { sql, ensure, json } from './_db.js';
+import { db, ensure, json } from '../../lib/db.js';
 
 const TYPES = new Set([
   'pageview', 'section_view', 'service_interest', 'project_view', 'project_gallery',
@@ -37,18 +37,19 @@ function clean(detail) {
   return null;
 }
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') return json(res, 405, { error: 'utiliser POST' });
+export async function onRequest({ request, env }) {
+  if (request.method !== 'POST') return json(405, { error: 'utiliser POST' });
 
-  let body = req.body;
-  /* sendBeacon envoie du text/plain : selon le cas Vercel donne déjà un objet,
-     sinon une chaîne à analyser nous-mêmes. */
-  if (typeof body === 'string') {
-    if (body.length > MAX_BODY) return json(res, 413, { error: 'trop volumineux' });
-    try { body = JSON.parse(body); } catch { return json(res, 400, { error: 'json invalide' }); }
-  }
-  if (!body || typeof body !== 'object') return json(res, 400, { error: 'corps manquant' });
-  if (!TYPES.has(body.t)) return json(res, 400, { error: 'type inconnu' });
+  /* sendBeacon envoie du text/plain : on lit toujours le corps en texte puis
+     on l'analyse nous-mêmes, quel que soit l'en-tête annoncé. */
+  let raw;
+  try { raw = await request.text(); } catch { return json(400, { error: 'corps illisible' }); }
+  if (raw.length > MAX_BODY) return json(413, { error: 'trop volumineux' });
+
+  let body;
+  try { body = JSON.parse(raw); } catch { return json(400, { error: 'json invalide' }); }
+  if (!body || typeof body !== 'object') return json(400, { error: 'corps manquant' });
+  if (!TYPES.has(body.t)) return json(400, { error: 'type inconnu' });
 
   /* L'horodatage vient du client : on le borne pour qu'une horloge fausse ne
      place pas un événement en 1970 ou l'an prochain. */
@@ -57,7 +58,8 @@ export default async function handler(req, res) {
   if (!Number.isFinite(ts) || ts < now - 7 * 864e5 || ts > now + 6e5) ts = now;
 
   try {
-    await ensure();
+    const sql = db(env);
+    await ensure(sql);
     await sql`
       INSERT INTO events (ts, type, detail, lang, src, dev, path, sid, vid, created_at)
       VALUES (${ts}, ${body.t}, ${clean(body.d)}, ${cut(body.lang, 8) || null},
@@ -65,9 +67,9 @@ export default async function handler(req, res) {
               ${cut(body.path, 120) || null}, ${cut(body.sid, 40) || null},
               ${cut(body.vid, 40) || null}, ${now})`;
   } catch (e) {
-    return json(res, 500, { error: 'écriture impossible', detail: String(e).slice(0, 200) });
+    return json(500, { error: 'écriture impossible', detail: String(e).slice(0, 200) });
   }
 
   /* 204 : sendBeacon n'attend aucun corps de réponse. */
-  res.status(204).end();
+  return new Response(null, { status: 204 });
 }

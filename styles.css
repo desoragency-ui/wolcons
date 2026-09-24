@@ -541,6 +541,21 @@ sup{font-size:.7em;line-height:0;vertical-align:super}
 .footer__dash:hover,.footer__dash:focus-visible{opacity:1;color:var(--orange)}
 .footer__dash[hidden]{display:none}
 
+/* Bouton flottant « Tableau de bord » — propriétaires seulement (script.js) */
+.owner-dash{
+  position:fixed;left:1rem;bottom:1rem;z-index:var(--z-float);
+  display:inline-flex;align-items:center;gap:.5rem;
+  min-height:44px;padding:.6rem 1rem;
+  background:var(--navy);color:#fff;border-radius:var(--radius);
+  border-left:3px solid var(--orange);
+  font-size:.85rem;font-weight:600;letter-spacing:.01em;text-decoration:none;
+  box-shadow:0 10px 30px -10px rgba(6,37,55,.55);
+  transition:transform var(--dur) var(--ease),background var(--dur) var(--ease);
+}
+.owner-dash svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.owner-dash:hover,.owner-dash:focus-visible{background:var(--orange);transform:translateY(-2px);color:#fff}
+.owner-dash[hidden]{display:none}
+
 .footer__bottom{
   display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;justify-content:space-between;
   padding-block:1.25rem;border-top:1px solid var(--line-dark);font-size:.82rem;

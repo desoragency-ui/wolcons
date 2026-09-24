@@ -2,8 +2,16 @@
   "name": "wolcons",
   "private": true,
   "type": "module",
-  "description": "Site vitrine Wolcons + collecteur analytics (fonctions Vercel).",
+  "description": "Site vitrine Wolcons + collecteur analytics (Cloudflare Pages Functions + Neon).",
+  "scripts": {
+    "build": "node tools/build-site.mjs",
+    "dev": "npm run build && wrangler pages dev dist",
+    "deploy": "npm run build && wrangler pages deploy dist"
+  },
   "dependencies": {
-    "@vercel/postgres": "^0.10.0"
+    "@neondatabase/serverless": "^1.0.2"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
   }
 }

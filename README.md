@@ -262,40 +262,147 @@ qui rend le défilement continu, ses `alt` restent vides.
 
 Remplacer une image = déposer un fichier de même nom dans le même dossier.
 
-## Déploiement
+## Déploiement — Cloudflare Pages + Neon
 
-100 % statique → Netlify, Vercel, Cloudflare Pages, GitHub Pages, ou n'importe
-quel hébergement mutualisé. Glisser-déposer le dossier `wolcons/` suffit :
-aucune étape de build, aucune dépendance à installer.
+Le site est statique, mais le tableau de bord a besoin de deux choses qu'un
+hébergement de fichiers ne sait pas faire : **exécuter du code** (collecter les
+événements, les relire) et **garder une base**. D'où cette pile, choisie parce
+qu'elle est gratuite **et** autorisée en usage commercial :
 
-### Le tableau de bord doit être protégé côté hébergeur
-
-`/dashboard/` n'est pas public par nature, mais **rien dans ce dépôt ne le
-protège**. Ce qui existe aujourd'hui ne fait que le rendre discret :
-
-| Mesure | Ce qu'elle fait | Ce qu'elle ne fait pas |
+| Brique | Rôle | Offre gratuite |
 |---|---|---|
-| `<meta robots="noindex">` | demande aux moteurs de ne pas indexer | n'empêche pas l'accès |
-| `Disallow: /dashboard/` dans `robots.txt` | demande aux robots de ne pas explorer | n'empêche pas l'accès |
-| Lien de pied de page masqué (`?tdb=1`) | retire le lien de la vue des visiteurs | le code est public, l'URL reste tapable |
+| **Cloudflare Pages** | héberge le site + exécute `functions/` | bande passante illimitée, 100 000 requêtes de fonction/jour, 500 builds/mois |
+| **Neon** | base Postgres | 0,5 Go, 100 CU-h/mois, sans carte bancaire, **sans mise en veille** |
+| **Cloudflare Access** | authentifie `/dashboard/` | 50 utilisateurs |
 
-Un visiteur qui tape l'adresse arrive sur le tableau de bord. La seule vraie
-protection est une authentification chez l'hébergeur :
+> **Pourquoi pas Vercel ?** L'offre Hobby de Vercel interdit l'usage commercial.
+> Le site d'une entreprise qui vend n'y a pas sa place : la seule option
+> conforme serait Pro, à 20 $/mois. Cloudflare autorise le commercial dès le
+> plan gratuit.
+>
+> **Pourquoi pas Supabase ?** Son offre gratuite met le projet en veille après
+> 7 jours sans activité en base. Sur un site de TPE, le tableau de bord serait
+> éteint une semaine sur deux.
 
-- **Cloudflare Access** (gratuit jusqu'à 50 utilisateurs) — Zero Trust → Access
-  → Applications → Self-hosted, chemin `dashboard`, règle *Allow* sur les
-  adresses e-mail autorisées. Le visiteur reçoit un code par e-mail.
-- **Netlify** — protection par mot de passe (offre payante).
+### Ce que contient le dépôt
 
-À noter : `Disallow` empêchant l'exploration, un robot qui le respecte ne lira
-jamais le `noindex` de la page. Les deux mesures se doublent sans se renforcer ;
-c'est sans conséquence ici, mais ça explique pourquoi elles ne remplacent pas
-l'authentification.
+```
+index.html · styles.css · script.js · i18n.js · assets/ · dashboard/   le site
+functions/            code exécuté par Cloudflare
+  _middleware.js        authentification de /dashboard et des /api protégées
+  api/collect.js        POST public — réception des événements
+  api/events.js         GET protégé — lecture pour le tableau de bord
+  api/settings.js       GET/POST protégé — objectifs, prix au m², suivi des devis
+  api/pagespeed.js      GET protégé — mesure Google, en cache 12 h
+lib/db.js             connexion Neon + création des tables au premier appel
+tools/build-site.mjs  prépare dist/ (liste blanche de ce qui devient public)
+wrangler.toml         configuration Cloudflare Pages
+```
 
-### Données réelles
+`npm run build` ne compile rien : il **copie** vers `dist/` la liste blanche de
+`tools/build-site.mjs`. C'est ce qui évite de publier `README.md` (ces notes
+internes), `package.json`, `tools/` et `node_modules/`. Il écrit aussi
+`dist/_routes.json`, qui limite l'exécution des fonctions à `/dashboard/*` et
+`/api/*` : tout le reste est servi en statique pur, gratuit et illimité.
 
-Tant que `ENDPOINT` est vide dans `assets/js/analytics.js`, les événements
-restent dans le navigateur de chaque visiteur : le mode « Données réelles »
-n'affiche donc que votre propre navigation, sur votre propre appareil. Pour des
-chiffres multi-appareils, il faut un point de collecte (fonction serverless +
-table) et renseigner `ENDPOINT`.
+### Mise en ligne — une fois, ~20 minutes
+
+**1. Base Neon** — [neon.com](https://neon.com) → *Sign up* (gratuit, sans
+carte) → *Create project*, région **Europe (Frankfurt)**, la plus proche du
+Maroc. Copier la chaîne **Connection string** (`postgresql://…`).
+Aucune table à créer : elles se créent toutes seules au premier événement reçu.
+
+**2. Projet Cloudflare Pages** — [dash.cloudflare.com](https://dash.cloudflare.com)
+→ *Workers & Pages* → *Create* → *Pages* → *Connect to Git* → dépôt
+`desoragency-ui/wolcons`.
+
+| Réglage | Valeur |
+|---|---|
+| Build command | `npm run build` |
+| Build output directory | `dist` |
+| Root directory | (laisser vide) |
+
+**3. Variables** — *Settings → Variables and Secrets*, en **Production** :
+
+| Nom | Valeur | Type |
+|---|---|---|
+| `DATABASE_URL` | la chaîne Neon de l'étape 1 | Secret |
+| `PAGESPEED_KEY` | clé Google PageSpeed *(facultatif)* | Secret |
+
+Redéployer après avoir ajouté les variables : un déploiement ne les relit pas
+tout seul.
+
+**4. Domaine** — *Custom domains* → ajouter `wolcons.com`. Cloudflare demande
+de déléguer les serveurs de noms du domaine (gratuit) ; c'est aussi ce qui rend
+l'étape 5 possible.
+
+**5. Protéger le tableau de bord** — *Zero Trust → Access → Applications →
+Add an application → Self-hosted* :
+
+- Domaine `wolcons.com`, chemin `dashboard`
+- Ajouter une seconde application identique sur le domaine `wolcons.pages.dev`,
+  sinon l'adresse `*.pages.dev` reste un contournement
+- *Policy* : **Allow**, sélecteur **Emails**, avec les adresses autorisées
+- Méthode de connexion : **One-time PIN** (code reçu par e-mail, aucun compte à créer)
+
+Puis relever l'**Application Audience (AUD) Tag** de l'application et le
+domaine d'équipe, et les remettre dans Pages en variables :
+
+| Nom | Valeur |
+|---|---|
+| `ACCESS_TEAM_DOMAIN` | `wolcons` (ou `wolcons.cloudflareaccess.com`) |
+| `ACCESS_AUD` | le *AUD Tag* de l'application |
+
+Ces deux variables ne sont pas décoratives : `functions/_middleware.js`
+**vérifie la signature** du jeton émis par Access (émetteur, audience,
+expiration, clé publique de l'équipe). Sans cette vérification, il suffirait
+d'atteindre l'application par une autre adresse pour passer à côté d'Access.
+
+### Repli : mot de passe unique
+
+Si le domaine ne peut pas être délégué à Cloudflare, Access est indisponible.
+Dans ce cas, renseigner à la place :
+
+| Nom | Valeur |
+|---|---|
+| `DASH_PASSWORD` | le mot de passe | 
+| `DASH_USER` | l'identifiant, défaut `wolcons` |
+
+Le navigateur affiche alors sa propre fenêtre de connexion. Moins bien
+qu'Access — un seul secret pour tout le monde, non révocable individuellement —
+mais fonctionnel.
+
+**Si aucune des deux méthodes n'est configurée, tout est refusé (503).** Un
+tableau de bord injoignable vaut mieux qu'un tableau de bord ouvert.
+
+### En local
+
+```bash
+npm install
+npm run dev        # build + wrangler pages dev dist
+```
+
+`wrangler pages dev` a besoin d'un `DATABASE_URL` pour que les routes `/api/`
+répondent : le mettre dans un fichier `.dev.vars` à la racine (ignoré par git).
+
+```
+DATABASE_URL=postgresql://…
+DASH_PASSWORD=…
+```
+
+Pour travailler seulement sur le site vitrine, le serveur statique suffit et ne
+demande rien :
+
+```bash
+python -m http.server 8130
+```
+
+### Ce que voit le tableau de bord
+
+- **Données réelles** — tout ce que `/api/collect` a enregistré, tous appareils
+  et tous visiteurs confondus. C'est le mode normal une fois en ligne.
+- **Démo** — chiffres fictifs, étiquetés comme tels, pour juger de la maquette
+  avant que la base ait accumulé quoi que ce soit.
+
+Les premières heures après la mise en ligne, « Données réelles » sera presque
+vide : c'est normal, il n'y a encore rien à montrer.

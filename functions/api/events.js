@@ -19,7 +19,7 @@ export async function onRequest({ request, env }) {
     const sql = db(env);
     await ensure(sql);
     const rows = await sql`
-      SELECT id, ts, type, detail, lang, src, dev, path, sid, vid
+      SELECT id, ts, type, detail, lang, src, dev, path, sid, vid, city, country
         FROM events
        WHERE ts >= ${cutoff}
        ORDER BY ts DESC
@@ -35,7 +35,9 @@ export async function onRequest({ request, env }) {
       dev: r.dev,
       path: r.path,
       sid: r.sid,
-      vid: r.vid
+      vid: r.vid,
+      city: r.city,
+      country: r.country
     }));
 
     return json(200, { events, days, count: events.length });

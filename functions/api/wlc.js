@@ -7,6 +7,10 @@
 
    Aucune donnée nominative : analytics.js n'envoie que des initiales, jamais
    de nom, d'e-mail ni de téléphone, et aucune adresse IP n'est stockée.
+
+   La ville et le pays ne viennent pas du visiteur : Cloudflare les déduit de
+   la connexion et les remet dans request.cf. On garde ces deux mots, pas
+   l'adresse. C'est une estimation, surtout sur les données mobiles.
    ========================================================================== */
 import { db, ensure, json } from '../../lib/db.js';
 
@@ -57,15 +61,18 @@ export async function onRequest({ request, env }) {
   let ts = Number(body.ts);
   if (!Number.isFinite(ts) || ts < now - 7 * 864e5 || ts > now + 6e5) ts = now;
 
+  const geo = request.cf || {};
+
   try {
     const sql = db(env);
     await ensure(sql);
     await sql`
-      INSERT INTO events (ts, type, detail, lang, src, dev, path, sid, vid, created_at)
+      INSERT INTO events (ts, type, detail, lang, src, dev, path, sid, vid, city, country, created_at)
       VALUES (${ts}, ${body.t}, ${clean(body.d)}, ${cut(body.lang, 8) || null},
               ${cut(body.src, 60) || null}, ${cut(body.dev, 16) || null},
               ${cut(body.path, 120) || null}, ${cut(body.sid, 40) || null},
-              ${cut(body.vid, 40) || null}, ${now})`;
+              ${cut(body.vid, 40) || null}, ${cut(geo.city, 60) || null},
+              ${cut(geo.country, 2) || null}, ${now})`;
   } catch (e) {
     return json(500, { error: 'écriture impossible', detail: String(e).slice(0, 200) });
   }

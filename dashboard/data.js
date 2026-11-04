@@ -190,9 +190,30 @@
            String(d.getDate()).padStart(2, '0');
   }
 
+  /* Cloudflare donne les villes en anglais, le tableau de bord parle français. */
+  var CITY_FR = {
+    'Marrakesh': 'Marrakech', 'Fes': 'Fès', 'Tangier': 'Tanger', 'Meknes': 'Meknès',
+    'Kenitra': 'Kénitra', 'Sale': 'Salé', 'Temara': 'Témara', 'Tetouan': 'Tétouan'
+  };
+  var regionNames = null;
+  try { regionNames = new Intl.DisplayNames(['fr'], { type: 'region' }); } catch (e) {}
+
+  function countryName(code) {
+    try { return regionNames.of(code); } catch (e) { return code || ''; }
+  }
+
+  /* « Casablanca » au Maroc, « Paris (France) » ailleurs. Vide si la visite n'a
+     pas de lieu : celles d'avant le 4 novembre 2026 n'en ont jamais eu. */
+  function placeOf(e) {
+    if (!e.city && !e.country) return '';
+    if (!e.city) return countryName(e.country) + ' (ville inconnue)';
+    var city = CITY_FR[e.city] || e.city;
+    return e.country === 'MA' || !e.country ? city : city + ' (' + countryName(e.country) + ')';
+  }
+
   function emptyShape() {
     return {
-      series: [], sources: {}, types: {}, cities: {}, langs: {}, devices: {},
+      series: [], sources: {}, types: {}, cities: {}, citiesUnknown: 0, langs: {}, devices: {},
       funnel: {}, hours: [], projects: {}, filters: {}, budgets: {}, surfaces: {},
       delays: {}, sections: {}, faq: {}, scroll: {}, recent: [], events: [],
       pipelineByType: {}, engagement: {}, weekday: {}
@@ -478,6 +499,9 @@
             out.langs[e.lang] = (out.langs[e.lang] || 0) + 1;
             out.devices[e.dev] = (out.devices[e.dev] || 0) + 1;
             out.sources[e.src] = (out.sources[e.src] || 0) + 1;
+            var place = placeOf(e);
+            if (place) out.cities[place] = (out.cities[place] || 0) + 1;
+            else out.citiesUnknown++;
             break;
           case 'whatsapp_click': row.wa++; break;
           case 'call_click':     row.calls++; break;
@@ -497,7 +521,6 @@
             var mdh = isReal ? real : valueMDH(det.type, m2);
             row.value += mdh;
             out.types[det.type || 'Non précisé'] = (out.types[det.type || 'Non précisé'] || 0) + 1;
-            out.cities[det.ville || 'Non précisée'] = (out.cities[det.ville || 'Non précisée'] || 0) + 1;
             out.delays[det.delai || 'Non précisé'] = (out.delays[det.delai || 'Non précisé'] || 0) + 1;
             out.pipelineByType[det.type || 'Non précisé'] = (out.pipelineByType[det.type || 'Non précisé'] || 0) + mdh;
             if (m2) out.surfaces[bandOfSurface(m2)] = (out.surfaces[bandOfSurface(m2)] || 0) + 1;

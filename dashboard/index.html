@@ -432,7 +432,8 @@ footer{max-width:1620px;margin:0 auto;padding:1.3rem var(--pad) 2.5rem;font-size
 
     <div class="card span-4">
       <h3>Zone géographique</h3>
-      <p class="card__sub">Ville d’origine des visites et des demandes</p>
+      <p class="card__sub">Ville des visiteurs, estimée d’après leur connexion internet</p>
+      <p class="card__sub" id="citiesNote" hidden></p>
       <div class="chart" id="cCities"></div>
       <details class="tv"><summary>Voir les données en tableau</summary><div class="tbl-wrap scroll-y" id="tCities"></div></details>
     </div>
@@ -1057,7 +1058,12 @@ footer{max-width:1620px;margin:0 auto;padding:1.3rem var(--pad) 2.5rem;font-size
      série, donc UNE seule teinte — le slot 1. Colorer chaque barre selon sa
      valeur ré-encoderait en couleur ce que la longueur dit déjà.              */
   function types()    { hbar('cTypes', sortedEntries(D.types, true), CAT[0], 'consultations', 'tTypes', ['Métier', 'Consultations', 'Part']); }
-  function cities()   { hbar('cCities', sortedEntries(D.cities, true), CAT[0], 'visites', 'tCities', ['Ville', 'Visites', 'Part']); }
+  function cities() {
+    hbar('cCities', sortedEntries(D.cities, true), CAT[0], 'visites', 'tCities', ['Ville', 'Visites', 'Part']);
+    var note = document.getElementById('citiesNote'), n = D.citiesUnknown || 0;
+    note.hidden = !n;
+    note.textContent = n ? fmt(n) + (n > 1 ? ' visites' : ' visite') + ' sans ville : la mesure a commencé le 4 novembre 2026.' : '';
+  }
   function projects() { hbar('cProjects', sortedEntries(D.projects, true).slice(-13), CAT[0], 'vues', 'tProjects', ['Réalisation', 'Vues', 'Part']); }
   function faq()      { hbar('cFaq', sortedEntries(D.faq, true), CAT[0], 'ouvertures', 'tFaq', ['Question', 'Ouvertures', 'Part']); }
   function filters()  { hbar('cFilters', sortedEntries(D.filters, true), CAT[0], 'clics', 'tFilters', ['Filtre', 'Clics', 'Part']); }

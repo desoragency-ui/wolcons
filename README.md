@@ -414,3 +414,10 @@ python -m http.server 8130
 
 Les premières heures après la mise en ligne, « Données réelles » sera presque
 vide : c'est normal, il n'y a encore rien à montrer.
+
+**Zone géographique** compte les visites par ville. La ville est estimée par
+Cloudflare d'après la connexion (`request.cf`) : l'adresse IP n'est pas gardée,
+et sur les données mobiles la ville peut être celle de l'opérateur. Les visites
+d'avant le 4 novembre 2026 n'ont pas de ville, et aucun moyen de la retrouver.
+La ville du formulaire de devis est autre chose, le lieu du chantier : elle
+reste dans le tableau des demandes.
